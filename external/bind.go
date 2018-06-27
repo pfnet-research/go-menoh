@@ -1,3 +1,5 @@
+// Package external provides APIs to operate Menoh model directory.
+// API design follows menoh.h interface.
 package external
 
 /*
@@ -13,15 +15,18 @@ import (
 	"unsafe"
 )
 
+// ModelData bind. Required to delete after making, call Delete function.
 type ModelData struct {
 	h C.menoh_model_data_handle
 }
 
+// Delete object.
 func (m *ModelData) Delete() {
 	C.menoh_delete_model_data(m.h)
 	m.h = nil
 }
 
+// MakeModelDataFromONNX returns ModelData using ONNX file path.
 func MakeModelDataFromONNX(path string) (*ModelData, error) {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
@@ -32,19 +37,23 @@ func MakeModelDataFromONNX(path string) (*ModelData, error) {
 	return &ModelData{h: h}, nil
 }
 
+// Optimize ModelData with profiling table.
 func (m *ModelData) Optimize(table VariableProfileTable) error {
 	return checkError(C.menoh_model_data_optimize(m.h, table.h))
 }
 
+// VariableProfileTableBuilder bind. Required to delete after making, call Delete function.
 type VariableProfileTableBuilder struct {
 	h C.menoh_variable_profile_table_builder_handle
 }
 
+// Delete object.
 func (b *VariableProfileTableBuilder) Delete() {
 	C.menoh_delete_variable_profile_table_builder(b.h)
 	b.h = nil
 }
 
+// MakeVariableProfileTableBuilder returns VariableProfileTableBuilder.
 func MakeVariableProfileTableBuilder() (*VariableProfileTableBuilder, error) {
 	var h C.menoh_variable_profile_table_builder_handle
 	if err := checkError(C.menoh_make_variable_profile_table_builder(&h)); err != nil {
@@ -53,6 +62,7 @@ func MakeVariableProfileTableBuilder() (*VariableProfileTableBuilder, error) {
 	return &VariableProfileTableBuilder{h: h}, nil
 }
 
+// AddInputProfile adds input profile with layer name, data type and dimension size.
 func (b *VariableProfileTableBuilder) AddInputProfile(name string, dtype TypeMenohDtype, dims ...int32) error {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
@@ -70,6 +80,7 @@ func (b *VariableProfileTableBuilder) AddInputProfile(name string, dtype TypeMen
 	}
 }
 
+// AddOutputProfile adds output profile with layer name and data type.
 func (b *VariableProfileTableBuilder) AddOutputProfile(name string, dtype TypeMenohDtype) error {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
@@ -78,6 +89,7 @@ func (b *VariableProfileTableBuilder) AddOutputProfile(name string, dtype TypeMe
 			b.h, cName, C.int(dtype)))
 }
 
+// BuildVariableProfileTable returns VariableProfileTable.
 func (b *VariableProfileTableBuilder) BuildVariableProfileTable(md ModelData) (
 	*VariableProfileTable, error) {
 
@@ -88,20 +100,24 @@ func (b *VariableProfileTableBuilder) BuildVariableProfileTable(md ModelData) (
 	return &VariableProfileTable{h: h}, nil
 }
 
+// VariableProfile represents profile information to make real variable.
 type VariableProfile struct {
 	Dtype TypeMenohDtype
 	Dims  []int32
 }
 
+// VariableProfileTable bind. Required to delete after making, call Delete function.
 type VariableProfileTable struct {
 	h C.menoh_variable_profile_table_handle
 }
 
+// Delete object.
 func (t *VariableProfileTable) Delete() {
 	C.menoh_delete_variable_profile_table(t.h)
 	t.h = nil
 }
 
+// GetVariableProfile returns profile which setup variable information includes.
 func (t *VariableProfileTable) GetVariableProfile(name string) (*VariableProfile, error) {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
@@ -127,15 +143,18 @@ func (t *VariableProfileTable) GetVariableProfile(name string) (*VariableProfile
 	}, nil
 }
 
+// ModelBuilder bind. Required to delete after making, call Delete function.
 type ModelBuilder struct {
 	h C.menoh_model_builder_handle
 }
 
+// Delete object.
 func (b *ModelBuilder) Delete() {
 	C.menoh_delete_model_builder(b.h)
 	b.h = nil
 }
 
+// MakeModelBuilder returns ModelBuilder.
 func MakeModelBuilder(vpt VariableProfileTable) (*ModelBuilder, error) {
 	var h C.menoh_model_builder_handle
 	if err := checkError(C.menoh_make_model_builder(vpt.h, &h)); err != nil {
@@ -144,6 +163,8 @@ func MakeModelBuilder(vpt VariableProfileTable) (*ModelBuilder, error) {
 	return &ModelBuilder{h: h}, nil
 }
 
+// AttachExternalBuffer attaches data buffer to get data. This process must be done
+// before building Model.
 func (b *ModelBuilder) AttachExternalBuffer(variableName string, bufferPtr unsafe.Pointer) error {
 	cVariableName := C.CString(variableName)
 	defer C.free(unsafe.Pointer(cVariableName))
@@ -151,6 +172,7 @@ func (b *ModelBuilder) AttachExternalBuffer(variableName string, bufferPtr unsaf
 		C.menoh_model_builder_attach_external_buffer(b.h, cVariableName, bufferPtr))
 }
 
+// BuildModel returns Model.
 func (b *ModelBuilder) BuildModel(md ModelData, backend, backendConfig string) (*Model, error) {
 	cBackend := C.CString(backend)
 	defer C.free(unsafe.Pointer(cBackend))
@@ -163,21 +185,25 @@ func (b *ModelBuilder) BuildModel(md ModelData, backend, backendConfig string) (
 	return &Model{h: h}, nil
 }
 
+// Variable represents data include data attribution and pointer.
 type Variable struct {
 	Dtype  TypeMenohDtype
 	Dims   []int32
 	BufferHandle unsafe.Pointer
 }
 
+// Model bind. Required to delete after making, call Delete function.
 type Model struct {
 	h C.menoh_model_handle
 }
 
+// Delete object.
 func (m *Model) Delete() {
 	C.menoh_delete_model(m.h)
 	m.h = nil
 }
 
+// GetVariable returns Variable, which set the target data information.
 func (m *Model) GetVariable(name string) (*Variable, error) {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
@@ -214,6 +240,7 @@ func (m *Model) GetVariable(name string) (*Variable, error) {
 	}, nil
 }
 
+// Run calculation.
 func (m *Model) Run() error {
 	return checkError(C.menoh_model_run(m.h))
 }

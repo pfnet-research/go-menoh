@@ -5,9 +5,13 @@ import (
 	"unsafe"
 )
 
+// Tensor is base unit of matrix data to pass Menoh model.
 type Tensor interface {
 	ptr() unsafe.Pointer
 	dtype() TypeDtype
+
+	// FloatArray returns float32 array. Returns an error when the array
+	// cannot cast to the type.
 	FloatArray() ([]float32, error)
 }
 
@@ -57,6 +61,7 @@ func updateArray(src, dst Tensor) error {
 	return nil
 }
 
+// FloatTensor represents float32 Tessor.
 type FloatTensor struct {
 	Dtype TypeDtype
 	Dims  []int32
@@ -71,6 +76,7 @@ func (t *FloatTensor) dtype() TypeDtype {
 	return t.Dtype
 }
 
+// FloatArray returns float32 array.
 func (t *FloatTensor) FloatArray() ([]float32, error) {
 	return t.Array, nil
 }

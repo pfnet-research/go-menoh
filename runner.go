@@ -20,7 +20,8 @@ type Runner struct {
 	vps map[string]Tensor
 }
 
-// NewRunner returns Runner.
+// NewRunner returns Runner using configuration, the runner setup Menoh model
+// and ready for execution. Require to call Stop function after the process is done.
 func NewRunner(conf Config) (runner *Runner, rootErr error) {
 	runner = &Runner{conf: conf}
 	defer func() {
@@ -126,12 +127,15 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 	return
 }
 
+// RunWithTensor inputs the tenser with tne name, and runs.
 func (r *Runner) RunWithTensor(name string, t Tensor) error {
 	return r.Run(map[string]Tensor{
 		name: t,
 	})
 }
 
+// Run with the inputs which are set name and tensor as key-value.
+// If nothing to input, set nil.
 func (r *Runner) Run(inputs map[string]Tensor) error {
 	for n, t := range inputs {
 		tensor, ok := r.vps[n]
@@ -145,10 +149,12 @@ func (r *Runner) Run(inputs map[string]Tensor) error {
 	return r.model.Run()
 }
 
+// Outputs all variables set by the configuration.
 func (r *Runner) Outputs() map[string]Tensor {
 	return r.vps
 }
 
+// GetOutput returns the target variable.
 func (r *Runner) GetOutput(name string) (Tensor, error) {
 	t, ok := r.vps[name]
 	if ok {
@@ -157,6 +163,7 @@ func (r *Runner) GetOutput(name string) (Tensor, error) {
 	return nil, fmt.Errorf("%s is not found", name)
 }
 
+// Stop the runner.
 func (r *Runner) Stop() {
 	if r.model != nil {
 		r.model.Delete()
