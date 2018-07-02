@@ -7,7 +7,7 @@ Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 - OS
   - Linux
   - Mac
-  - ~~Windows~~ (TBD)
+  - Windows
 - Go 1.10+
 - [Menoh](https://github.com/pfnet-research/menoh) 1.0.1+
 
@@ -18,6 +18,23 @@ After install Menoh, then
 ```bash
 $ go get -u github.com/pfnet-research/menoh-go
 ```
+
+### Windows
+
+Add a path to DLLs distributed by Menoh to local Path environment.
+
+```
+\path\to\menoh\bin
+  |- libiomp5md.dll
+  |- menoh.dll
+  |- mkldnn.dll
+  |- mklml.dll
+```
+
+```
+set PATH=\path\to\menoh\bin;%PATH%
+```
+
 
 ## Usage
 
