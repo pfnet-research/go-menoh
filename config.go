@@ -18,9 +18,9 @@ type InputConfig struct {
 
 // OutputConfig is output variable information to get from the model.
 type OutputConfig struct {
-	Name        string    // layer name
-	Dtype       TypeDtype // data type
-	FromProfile bool      // if the output comes from operator variable such as weight, set true
+	Name         string    // layer name
+	Dtype        TypeDtype // data type
+	FromInternal bool      // if the output comes from operator variable such as weight, set true
 }
 
 // TypeDtype is a type of data.

@@ -187,8 +187,8 @@ func (b *ModelBuilder) BuildModel(md ModelData, backend, backendConfig string) (
 
 // Variable represents data include data attribution and pointer.
 type Variable struct {
-	Dtype  TypeMenohDtype
-	Dims   []int32
+	Dtype        TypeMenohDtype
+	Dims         []int32
 	BufferHandle unsafe.Pointer
 }
 
@@ -209,33 +209,29 @@ func (m *Model) GetVariable(name string) (*Variable, error) {
 	defer C.free(unsafe.Pointer(cName))
 
 	var dtype C.int
-	e := C.menoh_model_get_variable_dtype(m.h, cName, &dtype)
-	if err := checkError(e); err != nil {
+	if err := checkError(C.menoh_model_get_variable_dtype(m.h, cName, &dtype)); err != nil {
 		return nil, err
 	}
 	var size C.int
-	e = C.menoh_model_get_variable_dims_size(m.h, cName, &size)
-	if err := checkError(e); err != nil {
+	if err := checkError(C.menoh_model_get_variable_dims_size(m.h, cName, &size)); err != nil {
 		return nil, err
 	}
 	dims := make([]int32, size)
 	for i := 0; i < int(size); i++ {
 		var dim C.int
-		e := C.menoh_model_get_variable_dims_at(m.h, cName, C.int(i), &dim)
-		if err := checkError(e); err != nil {
+		if err := checkError(C.menoh_model_get_variable_dims_at(m.h, cName, C.int(i), &dim)); err != nil {
 			return nil, err
 		}
 		dims[i] = int32(dim)
 	}
 	var ptr unsafe.Pointer
-	e = C.menoh_model_get_variable_buffer_handle(m.h, cName, &ptr)
-	if err := checkError(e); err != nil {
+	if err := checkError(C.menoh_model_get_variable_buffer_handle(m.h, cName, &ptr)); err != nil {
 		return nil, err
 	}
 
 	return &Variable{
-		Dtype:  toDtype(dtype),
-		Dims:   dims,
+		Dtype:        toDtype(dtype),
+		Dims:         dims,
 		BufferHandle: ptr,
 	}, nil
 }

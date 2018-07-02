@@ -66,7 +66,7 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 	runner.vpTable = vpt
 	runner.vps = map[string]Tensor{}
 	for _, c := range conf.Outputs {
-		if !c.FromProfile {
+		if !c.FromInternal {
 			continue
 		}
 		vp, err := vpt.GetVariableProfile(c.Name)
@@ -94,7 +94,7 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 		runner.vps[c.Name] = tensor
 	}
 	for _, c := range conf.Outputs {
-		if !c.FromProfile {
+		if !c.FromInternal {
 			continue
 		}
 		tensor := runner.vps[c.Name]
@@ -111,7 +111,7 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 	}
 	runner.model = model
 	for _, c := range conf.Outputs {
-		if c.FromProfile {
+		if c.FromInternal {
 			continue
 		}
 		out, err := model.GetVariable(c.Name)

@@ -63,14 +63,14 @@ func main() {
 		},
 		Outputs: []menoh.OutputConfig{
 			menoh.OutputConfig{
-				Name:        fc6OutName,
-				Dtype:       menoh.TypeFloat,
-				FromProfile: true,
+				Name:         fc6OutName,
+				Dtype:        menoh.TypeFloat,
+				FromInternal: true,
 			},
 			menoh.OutputConfig{
-				Name:        softmaxOutName,
-				Dtype:       menoh.TypeFloat,
-				FromProfile: false,
+				Name:         softmaxOutName,
+				Dtype:        menoh.TypeFloat,
+				FromInternal: false,
 			},
 		},
 	})

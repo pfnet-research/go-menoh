@@ -59,7 +59,7 @@ input0Conv := menoh.InputConfig{
 output39Softmax := menoh.OutputConfig{
 	Name: "140326200803680",
 	Dtype: menoh.TypeFloat,
-	FromProfile: false,
+	FromInternal: false,
 }
 ```
 
@@ -73,7 +73,7 @@ In additional, to show feature vectors, setup `menoh.OutputConfig` as same.
 output32FC := menoh.OutputConfig{
 	Name: "140326200777584",
 	Dtype: menoh.TypeFloat,
-	FromProfile: true, // mark to output as feature vector
+	FromInternal: true, // mark to output as feature vector
 }
 ```
 
