@@ -1,3 +1,5 @@
+// +build !windows
+
 // Package external provides APIs to operate Menoh model directory.
 // API design follows menoh.h interface.
 package external
