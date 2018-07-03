@@ -39,3 +39,7 @@ set PATH=\path\to\menoh\bin;%PATH%
 ## Usage
 
 See [example/vgg16/tutorial](example/vgg16/README.md)
+
+## License
+
+MIT License (see [LICENSE](/LICENSE) file).
