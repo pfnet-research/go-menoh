@@ -4,10 +4,6 @@ Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 
 ## Requirements
 
-- OS
-  - Linux
-  - Mac
-  - Windows
 - Go 1.10+
 - [Menoh](https://github.com/pfnet-research/menoh) 1.0.1+
 
@@ -17,6 +13,14 @@ After install Menoh, then
 
 ```bash
 $ go get -u github.com/pfnet-research/menoh-go
+```
+
+### Linux/Mac
+
+Add a path to library to `LD_LIBRARY_PATH` environment variable. Menoh libraries are installed to `/usr/local/lib` on default.
+
+```bash
+$ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
 ### Windows
@@ -31,7 +35,7 @@ Add a path to DLLs distributed by Menoh to local Path environment.
   |- mklml.dll
 ```
 
-```
+```cmd
 set PATH=\path\to\menoh\bin;%PATH%
 ```
 
