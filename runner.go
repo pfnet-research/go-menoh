@@ -22,45 +22,40 @@ type Runner struct {
 
 // NewRunner returns Runner using configuration, the runner setup Menoh model
 // and ready for execution. Require to call Stop function after the process is done.
-func NewRunner(conf Config) (runner *Runner, rootErr error) {
+func NewRunner(conf Config) (runner *Runner, err error) {
 	runner = &Runner{conf: conf}
 	defer func() {
-		if rootErr != nil {
+		if err != nil {
 			runner.Stop()
 		}
 	}()
 
 	modelData, err := external.MakeModelDataFromONNX(conf.ONNXModelPath)
 	if err != nil {
-		rootErr = err
 		return
 	}
 	runner.modelData = modelData
 
 	vptBuilder, err := external.MakeVariableProfileTableBuilder()
 	if err != nil {
-		rootErr = err
 		return
 	}
 	runner.vptBuilder = vptBuilder
 	for _, c := range conf.Inputs {
 		menohDtype, _ := toMenohDtype(c.Dtype)
-		if err := vptBuilder.AddInputProfile(c.Name, menohDtype, c.Dims...); err != nil {
-			rootErr = err
+		if err = vptBuilder.AddInputProfile(c.Name, menohDtype, c.Dims...); err != nil {
 			return
 		}
 	}
 	for _, c := range conf.Outputs {
 		menohDtype, _ := toMenohDtype(c.Dtype)
-		if err := vptBuilder.AddOutputProfile(c.Name, menohDtype); err != nil {
-			rootErr = err
+		if err = vptBuilder.AddOutputProfile(c.Name, menohDtype); err != nil {
 			return
 		}
 	}
 
 	vpt, err := vptBuilder.BuildVariableProfileTable(*modelData)
 	if err != nil {
-		rootErr = err
 		return
 	}
 	runner.vpTable = vpt
@@ -69,9 +64,9 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 		if !c.FromInternal {
 			continue
 		}
-		vp, err := vpt.GetVariableProfile(c.Name)
-		if err != nil {
-			rootErr = err
+		vp, lerr := vpt.GetVariableProfile(c.Name)
+		if lerr != nil {
+			err = lerr
 			return
 		}
 		dtype, _ := toDtype(vp.Dtype)
@@ -81,14 +76,12 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 
 	modelBuilder, err := external.MakeModelBuilder(*vpt)
 	if err != nil {
-		rootErr = err
 		return
 	}
 	runner.modelBuilder = modelBuilder
 	for _, c := range conf.Inputs {
 		tensor := newTensorHandle(c.Dtype, c.Dims...)
-		if err := modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
-			rootErr = err
+		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
 			return
 		}
 		runner.vps[c.Name] = tensor
@@ -98,15 +91,13 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 			continue
 		}
 		tensor := runner.vps[c.Name]
-		if err := modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
-			rootErr = err
+		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
 			return
 		}
 	}
 
 	model, err := modelBuilder.BuildModel(*modelData, conf.Backend.String(), conf.BackendConfig)
 	if err != nil {
-		rootErr = err
 		return
 	}
 	runner.model = model
@@ -114,9 +105,9 @@ func NewRunner(conf Config) (runner *Runner, rootErr error) {
 		if c.FromInternal {
 			continue
 		}
-		out, err := model.GetVariable(c.Name)
-		if err != nil {
-			rootErr = err
+		out, lerr := model.GetVariable(c.Name)
+		if lerr != nil {
+			err = lerr
 			return
 		}
 		dtype, _ := toDtype(out.Dtype)
