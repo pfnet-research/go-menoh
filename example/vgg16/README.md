@@ -46,7 +46,7 @@ VGG16 (VGG16.onnx) has one input and one output, input expects 1x3x224x224 dimen
 As code, `menoh.InputConfig`, `menoh.OutputConfig`:
 
 ```go
-import "github.com/pfnet-research/menoh-go"
+import "github.com/pfnet-research/go-menoh"
 ```
 
 ```go

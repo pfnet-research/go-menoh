@@ -1,3 +1,5 @@
+at 7/4/2018 13:00 renamed the repository name to **go-menoh** from menoh-go, following [recommended naming rule](https://github.com/golang/go/wiki/PackagePublishing)
+
 # Menoh Go
 
 Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
@@ -12,7 +14,7 @@ Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 After install Menoh, then
 
 ```bash
-$ go get -u github.com/pfnet-research/menoh-go
+$ go get -u github.com/pfnet-research/go-menoh
 ```
 
 ### Linux/Mac

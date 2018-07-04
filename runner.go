@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/pfnet-research/menoh-go/external"
+	"github.com/pfnet-research/go-menoh/external"
 )
 
 // Runner setups Menoh model with profiling and executes.

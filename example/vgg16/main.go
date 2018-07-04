@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
-	"github.com/pfnet-research/menoh-go"
+	"github.com/pfnet-research/go-menoh"
 )
 
 func main() {
