@@ -17,13 +17,18 @@ type Runner struct {
 
 	conf Config
 
-	vps map[string]Tensor
+	inputs  map[string]Tensor
+	outputs map[string]Tensor
 }
 
 // NewRunner returns Runner using configuration, the runner setup Menoh model
 // and ready for execution. Require to call Stop function after the process is done.
 func NewRunner(conf Config) (runner *Runner, err error) {
-	runner = &Runner{conf: conf}
+	runner = &Runner{
+		conf:    conf,
+		inputs:  map[string]Tensor{},
+		outputs: map[string]Tensor{},
+	}
 	defer func() {
 		if err != nil {
 			runner.Stop()
@@ -59,7 +64,6 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 		return
 	}
 	runner.vpTable = vpt
-	runner.vps = map[string]Tensor{}
 	for _, c := range conf.Outputs {
 		if !c.FromInternal {
 			continue
@@ -71,7 +75,7 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 		}
 		dtype, _ := toDtype(vp.Dtype)
 		tensor := newTensorHandle(dtype, vp.Dims...)
-		runner.vps[c.Name] = tensor
+		runner.outputs[c.Name] = tensor
 	}
 
 	modelBuilder, err := external.MakeModelBuilder(*vpt)
@@ -84,13 +88,13 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
 			return
 		}
-		runner.vps[c.Name] = tensor
+		runner.inputs[c.Name] = tensor
 	}
 	for _, c := range conf.Outputs {
 		if !c.FromInternal {
 			continue
 		}
-		tensor := runner.vps[c.Name]
+		tensor := runner.outputs[c.Name]
 		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
 			return
 		}
@@ -112,7 +116,7 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 		}
 		dtype, _ := toDtype(out.Dtype)
 		tensor := newTensorHandleByPtr(dtype, out.BufferHandle, out.Dims...)
-		runner.vps[c.Name] = tensor
+		runner.outputs[c.Name] = tensor
 	}
 
 	return
@@ -129,7 +133,7 @@ func (r *Runner) RunWithTensor(name string, t Tensor) error {
 // If nothing to input, set nil.
 func (r *Runner) Run(inputs map[string]Tensor) error {
 	for n, t := range inputs {
-		tensor, ok := r.vps[n]
+		tensor, ok := r.inputs[n]
 		if !ok {
 			return fmt.Errorf("%s is not attached", n)
 		}
@@ -142,12 +146,12 @@ func (r *Runner) Run(inputs map[string]Tensor) error {
 
 // Outputs all variables set by the configuration.
 func (r *Runner) Outputs() map[string]Tensor {
-	return r.vps
+	return r.outputs
 }
 
 // GetOutput returns the target variable.
 func (r *Runner) GetOutput(name string) (Tensor, error) {
-	t, ok := r.vps[name]
+	t, ok := r.outputs[name]
 	if ok {
 		return t, nil
 	}
