@@ -122,6 +122,15 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 	return
 }
 
+// GetInputTensor returns a Tensor attached to the target model.
+func (r *Runner) GetInputTensor(name string) (Tensor, error) {
+	tensor, ok := r.inputs[name]
+	if !ok {
+		return nil, fmt.Errorf("%s is not attached", name)
+	}
+	return tensor, nil
+}
+
 // RunWithTensor inputs the tenser with tne name, and runs.
 func (r *Runner) RunWithTensor(name string, t Tensor) error {
 	return r.Run(map[string]Tensor{
