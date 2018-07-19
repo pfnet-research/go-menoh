@@ -157,6 +157,45 @@ runner.Run(
 	})
 ```
 
+### Advanced
+
+In the above example, a float array of image is copied to another array attached in Menoh model internally. To reduce this copy, `Tensor` provides a method to update values directly. Before running, get the input variable from the runner.
+
+```go
+inputTensor, _ := runner.GetInputTensor(conv1_1InName)
+```
+
+This `inputTensor` has attached with Menoh model and is arrowed to update values. Following example code convert an image to float array and put `inputTensor` simultaneously, using `WriteFloat` method.
+
+```go
+updateImageToTensor(resizedImg, inputTensor)
+```
+
+```go
+func updateImageToTensor(img image.Image, tensor menoh.Tensor) error {\
+	bounds := img.Bounds()
+	w, h := bounds.Dx(), bounds.Dy()
+	size := w * h
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			if err := tensor.WriteFloat(0*size+y*w+x, float32(b/257)); err != nil {
+				return err
+			}
+			if err := tensor.WriteFloat(1*size+y*w+x, float32(g/257)); err != nil {
+				return err
+			}
+			if err := tensor.WriteFloat(2*size+y*w+x, float32(r/257)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+```
+
+On this VGG16 example, array size is only 150528 (=3\*224\*224) and cost of copy is tiny compare to whole time of inference, so not applied this logic.
+
 ## Get output
 
 The runner has already setup 2 output variables, `39:Softmax` and `32:FC`. Calling `GetOutput()` with the target name then the runner returns result variable as `menoh.Tensor` type.
