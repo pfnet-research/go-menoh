@@ -47,17 +47,22 @@ As code, `menoh.InputConfig`, `menoh.OutputConfig`:
 
 ```go
 import "github.com/pfnet-research/go-menoh"
+
+const (
+	conv1_1InName  = "140326425860192"
+	softmaxOutName = "140326200803680"
+)
 ```
 
 ```go
 input0Conv := menoh.InputConfig{
-	Name: "140326425860192",
+	Name: conv1_1InName,
 	Dtype: menoh.TypeFloat,
 	Dims: []int32{1, 3, 224, 224},
 }
 
 output39Softmax := menoh.OutputConfig{
-	Name: "140326200803680",
+	Name: softmaxOutName,
 	Dtype: menoh.TypeFloat,
 	FromInternal: false,
 }
@@ -70,8 +75,12 @@ In additional, to show feature vectors, setup `menoh.OutputConfig` as same.
     - `output0: 140326200777584`
 
 ```go
+const (
+	fc6OutName = "140326200777584"
+)
+
 output32FC := menoh.OutputConfig{
-	Name: "140326200777584",
+	Name: fc6OutName,
 	Dtype: menoh.TypeFloat,
 	FromInternal: true, // mark to output as feature vector
 }
@@ -136,7 +145,7 @@ resizedImgTensor := &menoh.FloatTensor{
 Input the pre-precessed image to the runner.
 
 ```go
-runner.RunWithTensor("140326425860192", resizedImgTensor)
+runner.RunWithTensor(conv1_1InName, resizedImgTensor)
 ```
 
 or
@@ -144,17 +153,56 @@ or
 ```go
 runner.Run(
 	map[string]menoh.Tensor{
-		"140326425860192": resizedImgTensor,
+		conv1_1InName: resizedImgTensor,
 	})
 ```
+
+### Advanced
+
+In the above example, a float array of image is copied to another array attached in Menoh model internally. To reduce this copy, `Tensor` provides a method to update values directly. Before running, get the input variable from the runner.
+
+```go
+inputTensor, _ := runner.GetInput(conv1_1InName)
+```
+
+This `inputTensor` has attached with Menoh model and is arrowed to update values. Following example code convert an image to float array and put `inputTensor` simultaneously, using `WriteFloat` method.
+
+```go
+updateImageToTensor(resizedImg, inputTensor)
+```
+
+```go
+func updateImageToTensor(img image.Image, tensor menoh.Tensor) error {\
+	bounds := img.Bounds()
+	w, h := bounds.Dx(), bounds.Dy()
+	size := w * h
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			if err := tensor.WriteFloat(0*size+y*w+x, float32(b/257)); err != nil {
+				return err
+			}
+			if err := tensor.WriteFloat(1*size+y*w+x, float32(g/257)); err != nil {
+				return err
+			}
+			if err := tensor.WriteFloat(2*size+y*w+x, float32(r/257)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+```
+
+On this VGG16 example, array size is only 150528 (=3\*224\*224) and cost of copy is tiny compare to whole time of inference, so not applied this logic.
 
 ## Get output
 
 The runner has already setup 2 output variables, `39:Softmax` and `32:FC`. Calling `GetOutput()` with the target name then the runner returns result variable as `menoh.Tensor` type.
 
 ```go
-fc6OutTensor, _ := runner.GetOutput("140326200777584")
-softmaxOutTensor, _ := runner.GetOutput("140326200803680")
+fc6OutTensor, _ := runner.GetOutput(fc6OutName)
+softmaxOutTensor, _ := runner.GetOutput(softmaxOutName)
 ```
 
 To input another image, the runner returns variables calculated by the next image.
@@ -163,10 +211,10 @@ To input another image, the runner returns variables calculated by the next imag
 // prepare next image
 nextImage := &menoh.FloatTensor{...}
 // run with the next image
-runner.RunWithTensor("140326425860192", nextImage)
+runner.RunWithTensor(conv1_1InName, nextImage)
 // get another result
-fc6OutNext, _ := runner.GetOutput("140326200777584")
-softmaxOutNext, _ := runner.GetOutput("140326200803680")
+fc6OutNext, _ := runner.GetOutput(fc6OutName)
+softmaxOutNext, _ := runner.GetOutput(softmaxOutName)
 ```
 
 ## Running VGG16 example
