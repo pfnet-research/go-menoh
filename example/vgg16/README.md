@@ -162,7 +162,7 @@ runner.Run(
 In the above example, a float array of image is copied to another array attached in Menoh model internally. To reduce this copy, `Tensor` provides a method to update values directly. Before running, get the input variable from the runner.
 
 ```go
-inputTensor, _ := runner.GetInputTensor(conv1_1InName)
+inputTensor, _ := runner.GetInput(conv1_1InName)
 ```
 
 This `inputTensor` has attached with Menoh model and is arrowed to update values. Following example code convert an image to float array and put `inputTensor` simultaneously, using `WriteFloat` method.
