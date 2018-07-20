@@ -1,0 +1,16 @@
+platform:
+- x64
+
+environment:
+  global:
+    MENOH_VER: "1.0.2"
+
+install:
+- set PATH=C:\msys64\mingw64\bin;%PATH%
+- curl -o menoh.zip -L --insecure https://github.com/pfnet-research/menoh/releases/download/v%MENOH_VER%/menoh_prebuild_win_v%MENOH_VER%.zip
+- 7z x menoh.zip
+- set PATH=%APPVEYOR_BUILD_FOLDER%\menoh\bin;%PATH%
+
+build_script:
+- go get -v -t -d -v ./...
+- go build -v ./...
