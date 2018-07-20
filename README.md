@@ -2,6 +2,8 @@ at 7/4/2018 13:00 renamed the repository name to **go-menoh** from menoh-go, fol
 
 # Menoh Go
 
+[![Build Status](https://travis-ci.org/pfnet-research/go-menoh.svg?branch=master)](https://travis-ci.org/pfnet-research/go-menoh)
+
 Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 
 ## Requirements
