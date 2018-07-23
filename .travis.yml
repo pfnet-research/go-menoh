@@ -21,7 +21,7 @@ notifications:
 env:
   global:
     - MKL_DNN_VER: "0.14"
-    - MENOH_VER: "1.0.2"
+    - MENOH_VER: "1.0.3"
 
 cache:
   directories:
