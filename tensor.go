@@ -14,6 +14,9 @@ type Tensor interface {
 	// Size returns array size.
 	Size() int
 
+	// Shape returns shape of array dimension.
+	Shape() []int32
+
 	// FloatArray returns float32 array. Returns an error when the array
 	// cannot cast to the type. It is possible that returned array is copied
 	// or split-off from attached array in Menoh model. When updating values,
@@ -90,6 +93,11 @@ func (t *FloatTensor) Size() int {
 	return len(t.Array)
 }
 
+// Shape returns shape of array.
+func (t *FloatTensor) Shape() []int32 {
+	return t.Dims
+}
+
 // FloatArray returns float32 array.
 func (t *FloatTensor) FloatArray() ([]float32, error) {
 	return t.Array, nil
@@ -98,7 +106,8 @@ func (t *FloatTensor) FloatArray() ([]float32, error) {
 // WriteFloat puts float value to i-th index of array.
 func (t *FloatTensor) WriteFloat(i int, f float32) error {
 	if i >= t.Size() {
-		return fmt.Errorf("index %d is greater than array size(%d)", i, t.Size())
+		return fmt.Errorf("index %d is out of range, target array size is %d",
+			i, t.Size())
 	}
 	t.Array[i] = f
 	return nil

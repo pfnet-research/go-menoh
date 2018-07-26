@@ -10,7 +10,7 @@ Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 ## Requirements
 
 - Go 1.10+
-- [Menoh](https://github.com/pfnet-research/menoh) 1.0.1+
+- [Menoh](https://github.com/pfnet-research/menoh) 1.0.3+
 
 ## Install
 
@@ -44,10 +44,22 @@ Add a path to DLLs distributed by Menoh to local Path environment.
 set PATH=\path\to\menoh\bin;%PATH%
 ```
 
-
 ## Usage
 
 See [example/vgg16/tutorial](example/vgg16/README.md)
+
+## Development
+
+### Test
+
+Download ONNX file, using in menoh-rust test, before testing.
+
+```bash
+$ wget https://github.com/pfnet-research/menoh-rs/releases/download/assets/MLP.onnx -P test_data
+$ go test ./...
+```
+
+Additionally go-menoh follows `go vet` and `golint`.
 
 ## License
 

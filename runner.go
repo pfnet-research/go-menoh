@@ -32,6 +32,7 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 	defer func() {
 		if err != nil {
 			runner.Stop()
+			runner = nil
 		}
 	}()
 
