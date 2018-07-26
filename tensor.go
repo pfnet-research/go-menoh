@@ -106,7 +106,8 @@ func (t *FloatTensor) FloatArray() ([]float32, error) {
 // WriteFloat puts float value to i-th index of array.
 func (t *FloatTensor) WriteFloat(i int, f float32) error {
 	if i >= t.Size() {
-		return fmt.Errorf("index %d is greater than array size(%d)", i, t.Size())
+		return fmt.Errorf("index %d is out of range, target array size is %d",
+			i, t.Size())
 	}
 	t.Array[i] = f
 	return nil
