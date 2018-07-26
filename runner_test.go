@@ -8,11 +8,19 @@ import (
 	"testing"
 )
 
-func getRunner() (*Runner, error) {
+func getONNXFilepath() (string, error) {
 	onnxPath := filepath.Join("test_data", "MLP.onnx")
 	if _, err := os.Stat(onnxPath); err != nil {
-		return nil, fmt.Errorf(
+		return "", fmt.Errorf(
 			"ONNX file is not found, please put the file to %v", onnxPath)
+	}
+	return onnxPath, nil
+}
+
+func getRunner() (*Runner, error) {
+	onnxPath, err := getONNXFilepath()
+	if err != nil {
+		return nil, err
 	}
 	conf := Config{
 		ONNXModelPath: onnxPath,
@@ -39,12 +47,10 @@ func getRunner() (*Runner, error) {
 }
 
 func TestNewRunner(t *testing.T) {
-	onnxPath := filepath.Join("test_data", "MLP.onnx")
-	if _, err := os.Stat(onnxPath); err != nil {
-		t.Fatalf("ONNX file for test is not found, please put the file to %v",
-			onnxPath)
+	onnxPath, err := getONNXFilepath()
+	if err != nil {
+		t.Fatal(err)
 	}
-
 	inputConfig := InputConfig{
 		Name:  "input",
 		Dtype: TypeFloat,
@@ -64,10 +70,10 @@ func TestNewRunner(t *testing.T) {
 		}
 		runner, err := NewRunner(conf)
 		if err != nil {
-			t.Errorf("fail to setup runner, %v", err)
+			t.Errorf("runner should be created without error, %v", err)
 		}
 		if runner == nil {
-			t.Fatal("fail to make runner")
+			t.Fatal("runner should be created")
 		}
 		defer runner.Stop()
 	})
@@ -80,10 +86,10 @@ func TestNewRunner(t *testing.T) {
 		}
 		runner, err := NewRunner(conf)
 		if err != nil {
-			t.Errorf("fail to setup runner, %v", err)
+			t.Errorf("runner should be created without error, %v", err)
 		}
 		if runner == nil {
-			t.Fatal("fail to make runner")
+			t.Fatal("runner should be created")
 		}
 		defer runner.Stop()
 	})
@@ -153,7 +159,7 @@ func TestNewRunner(t *testing.T) {
 			runner, err := NewRunner(config)
 			if err != nil {
 				if !strings.Contains(fmt.Sprintf("%v", err), expected) {
-					t.Errorf(`fail to handle expected error
+					t.Errorf(`error message should contain expected phrase
    expected: %s
    actual  : %v`, expected, err)
 				}
