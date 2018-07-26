@@ -3,24 +3,26 @@ platform:
 
 environment:
   global:
+    GOPATH: c:\gopath
     MKL_DNN_VER: "0.14"
     MENOH_VER: "1.0.3"
 
 install:
-- set PATH=C:\msys64\mingw64\bin;%PATH%
-- curl -o mkl-dnn.zip -L --insecure https://github.com/pfnet-research/menoh/releases/download/v%MENOH_VER%/mkl-dnn-%MKL_DNN_VER%-win64.zip
-- 7z x mkl-dnn.zip
-- curl -o menoh.zip -L --insecure https://github.com/pfnet-research/menoh/releases/download/v%MENOH_VER%/menoh_prebuild_win_v%MENOH_VER%.zip
-- 7z x menoh.zip
-- set PATH=%APPVEYOR_BUILD_FOLDER%\mkl-dnn\lib;%APPVEYOR_BUILD_FOLDER%\menoh\bin;%PATH%
-- go get -u golang.org/x/lint/golint
+  - set PATH=C:\msys64\mingw64\bin;%PATH%
+  - curl -o mkl-dnn.zip -L --insecure https://github.com/pfnet-research/menoh/releases/download/v%MENOH_VER%/mkl-dnn-%MKL_DNN_VER%-win64.zip
+  - 7z x mkl-dnn.zip
+  - curl -o menoh.zip -L --insecure https://github.com/pfnet-research/menoh/releases/download/v%MENOH_VER%/menoh_prebuild_win_v%MENOH_VER%.zip
+  - 7z x menoh.zip
+  - set PATH=%APPVEYOR_BUILD_FOLDER%\mkl-dnn\lib;%APPVEYOR_BUILD_FOLDER%\menoh\bin;%PATH%
+  - set PATH=%GOPATH%\bin;%PATH%
+  - go get github.com/golang/lint/golint
 
 build_script:
-- go get -v -t -d -v ./...
-- go build -v ./...
+  - go get -t -d -v ./...
+  - go build -v ./...
 
 test_script:
-- go vet -v ./...
-- golint -set_exit_status ./...
-- curl -o test_data\MLP.onnx -L --insecure --create-dirs https://github.com/pfnet-research/menoh-rs/releases/download/assets/MLP.onnx
-- go test -v ./...
+  - go vet -v ./...
+  - golint -set_exit_status ./...
+  - curl -o test_data\MLP.onnx -L --insecure --create-dirs https://github.com/pfnet-research/menoh-rs/releases/download/assets/MLP.onnx
+  - go test -v ./...

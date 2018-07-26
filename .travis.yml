@@ -64,7 +64,7 @@ before_install:
   - export LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LIBRARY_PATH
   - export LD_LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LD_LIBRARY_PATH
   # Test tool
-  - go get -u golang.org/x/lint/golint
+  - go get github.com/golang/lint/golint
 
 install:
   - go get -t -d -v ./...
