@@ -14,6 +14,9 @@ type Tensor interface {
 	// Size returns array size.
 	Size() int
 
+	// Shape returns shape of array dimension.
+	Shape() []int32
+
 	// FloatArray returns float32 array. Returns an error when the array
 	// cannot cast to the type. It is possible that returned array is copied
 	// or split-off from attached array in Menoh model. When updating values,
@@ -88,6 +91,11 @@ func (t *FloatTensor) dtype() TypeDtype {
 // Size returns array size.
 func (t *FloatTensor) Size() int {
 	return len(t.Array)
+}
+
+// Shape returns shape of array.
+func (t *FloatTensor) Shape() []int32 {
+	return t.Dims
 }
 
 // FloatArray returns float32 array.
