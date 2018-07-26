@@ -108,7 +108,7 @@ func TestNewRunner(t *testing.T) {
 		testConfig{
 			name:     "attach no input profile",
 			config:   Config{ONNXModelPath: onnxPath},
-			expected: "input",
+			expected: "variable",
 		},
 		testConfig{
 			name: "attach invalid input profile",
@@ -135,7 +135,7 @@ func TestNewRunner(t *testing.T) {
 					},
 				},
 			},
-			expected: "output",
+			expected: "variable",
 		},
 		testConfig{
 			name: "invalid backend",
