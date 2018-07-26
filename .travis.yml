@@ -63,9 +63,13 @@ before_install:
   - export CPATH=$HOME/menoh-${MENOH_VER}/include:$HOME/mkl-dnn-${MKL_DNN_VER}/include:$CPATH
   - export LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LIBRARY_PATH
   - export LD_LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LD_LIBRARY_PATH
+  # Test tool
+  - go get -u golang.org/x/lint/golint
 
 install:
   - go get -t -d -v ./...
 
 script:
   - go build -v ./...
+  - go vet ./...
+  - golint -set_exit_status ./...
