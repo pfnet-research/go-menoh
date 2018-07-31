@@ -44,7 +44,6 @@ func main() {
 	}
 	resizedImg := cropAndResize(img, width, height)
 	resizedImgTensor := &menoh.FloatTensor{
-		Dtype: menoh.TypeFloat,
 		Dims:  []int32{batch, channel, height, width},
 		Array: toOneHotFloats(resizedImg, channel),
 	}

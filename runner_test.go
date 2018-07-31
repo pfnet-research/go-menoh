@@ -189,7 +189,6 @@ func TestGetInput(t *testing.T) {
 			t.Fatalf("input variable should be get, %v", err)
 		}
 		expected := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{1, 3},
 			Array: []float32{0., 0., 0.},
 		}
@@ -219,7 +218,6 @@ func TestRunWithTensorAndGetOutput(t *testing.T) {
 
 	t.Run("run with intput variable", func(t *testing.T) {
 		input := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{1, 3},
 			Array: []float32{0., 1., 2.},
 		}
@@ -233,7 +231,6 @@ func TestRunWithTensorAndGetOutput(t *testing.T) {
 				t.Fatalf("the runner should return the output, %v", err)
 			}
 			expected := &FloatTensor{
-				Dtype: TypeFloat,
 				Dims:  []int32{1, 5},
 				Array: []float32{0., 0., 15., 96., 177},
 			}
@@ -245,7 +242,6 @@ func TestRunWithTensorAndGetOutput(t *testing.T) {
 
 			t.Run("run next input", func(t *testing.T) {
 				input2 := &FloatTensor{
-					Dtype: TypeFloat,
 					Dims:  []int32{1, 3},
 					Array: []float32{0., 0.5, 1.},
 				}
@@ -259,7 +255,6 @@ func TestRunWithTensorAndGetOutput(t *testing.T) {
 						t.Fatalf("the runner should return the output, %v", err)
 					}
 					expected := &FloatTensor{
-						Dtype: TypeFloat,
 						Dims:  []int32{1, 5},
 						Array: []float32{0., 0., 8., 51., 94},
 					}
@@ -294,7 +289,6 @@ func TestRunAndOutputs(t *testing.T) {
 	t.Run("run with map input", func(t *testing.T) {
 		inputs := map[string]Tensor{
 			"input": &FloatTensor{
-				Dtype: TypeFloat,
 				Dims:  []int32{1, 3},
 				Array: []float32{0., 1., 2.},
 			},
@@ -310,7 +304,6 @@ func TestRunAndOutputs(t *testing.T) {
 				t.Fatal("the runner should return the output")
 			}
 			expected := &FloatTensor{
-				Dtype: TypeFloat,
 				Dims:  []int32{1, 5},
 				Array: []float32{0., 0., 15., 96., 177},
 			}
@@ -338,7 +331,6 @@ func TestRunAndOutputs(t *testing.T) {
 						t.Fatal("the runner should return the output")
 					}
 					expected := &FloatTensor{
-						Dtype: TypeFloat,
 						Dims:  []int32{1, 5},
 						Array: []float32{0., 0., 8., 51., 94},
 					}

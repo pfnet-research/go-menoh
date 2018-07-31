@@ -136,7 +136,6 @@ resizedImg := cropAndResize(img, width, height)
 oneHotFloats := toOneHotFloats(resizedImg, channel)
 // make Tensor to input the runner
 resizedImgTensor := &menoh.FloatTensor{
-	Dtype: menoh.TypeFloat,
 	Dims:  []int32{1, 3, 224, 224},
 	Array: oneHotFloats,
 }
