@@ -46,7 +46,8 @@ set PATH=\path\to\menoh\bin;%PATH%
 
 ## Usage
 
-See [example/vgg16/tutorial](example/vgg16/README.md)
+- [example/vgg16](example/vgg16) is a tutorial for this package.
+- [example/mnist](example/mnist) is an example using MNIST dataset and model.
 
 ## Development
 
