@@ -111,7 +111,6 @@ func runTest(runner *menoh.Runner, inputPath, outputPath string) error {
 	// classify input array
 	dims := input.GetDims()
 	inputTensor := &menoh.FloatTensor{
-		Dtype: menoh.TypeFloat,
 		Dims:  []int32{int32(dims[0]), int32(dims[1]), int32(dims[2]), int32(dims[3])},
 		Array: convertToFloat32Array(input.GetRawData()),
 	}

@@ -34,7 +34,6 @@ func newTensorHandle(dtype TypeDtype, dims ...int32) Tensor {
 		len *= int(d)
 	}
 	return &FloatTensor{
-		Dtype: dtype,
 		Dims:  dims,
 		Array: make([]float32, len),
 	}
@@ -47,7 +46,6 @@ func newTensorHandleByPtr(dtype TypeDtype, ptr unsafe.Pointer, dims ...int32) Te
 		len *= int(d)
 	}
 	return &FloatTensor{
-		Dtype: dtype,
 		Dims:  dims,
 		Array: (*[1 << 31]float32)(ptr)[:len],
 	}
@@ -75,7 +73,6 @@ func updateArray(src, dst Tensor) error {
 
 // FloatTensor represents float32 Tessor.
 type FloatTensor struct {
-	Dtype TypeDtype
 	Dims  []int32
 	Array []float32
 }
@@ -85,7 +82,7 @@ func (t *FloatTensor) ptr() unsafe.Pointer {
 }
 
 func (t *FloatTensor) dtype() TypeDtype {
-	return t.Dtype
+	return TypeFloat
 }
 
 // Size returns array size.

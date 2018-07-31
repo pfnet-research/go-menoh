@@ -7,12 +7,10 @@ import (
 func TestUpdateArray(t *testing.T) {
 	t.Run("update array", func(t *testing.T) {
 		src := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{5},
 			Array: []float32{1., 2., 3., 4., 5.},
 		}
 		dst := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{5},
 			Array: []float32{0., 0., 0., 0., 0.},
 		}
@@ -27,12 +25,10 @@ func TestUpdateArray(t *testing.T) {
 	})
 	t.Run("update not same size", func(t *testing.T) {
 		src := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{5},
 			Array: make([]float32, 5),
 		}
 		dst := &FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{4},
 			Array: make([]float32, 4),
 		}
@@ -45,7 +41,6 @@ func TestUpdateArray(t *testing.T) {
 func TestFloatTensorWriteFloat(t *testing.T) {
 	t.Run("write a value", func(t *testing.T) {
 		tensor := FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{5},
 			Array: []float32{0., 0., 0., 0., 0.},
 		}
@@ -61,7 +56,6 @@ func TestFloatTensorWriteFloat(t *testing.T) {
 	})
 	t.Run("write to out of range", func(t *testing.T) {
 		tensor := FloatTensor{
-			Dtype: TypeFloat,
 			Dims:  []int32{5},
 			Array: []float32{0., 0., 0., 0., 0.},
 		}
