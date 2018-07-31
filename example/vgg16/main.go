@@ -25,9 +25,9 @@ func main() {
 		softmaxOutName = "140326200803680"
 	)
 	var (
-		inputImagePath  = flag.String("input-image", "../../data/Light_sussex_hen.jpg", "input image path")
-		onnxModelPath   = flag.String("model", "../../data/VGG16.onnx", "ONNX model path")
-		synsetWordsPath = flag.String("synset-words", "../../data/synset_words.txt", "synset words file path")
+		inputImagePath  = flag.String("input-image", "data/Light_sussex_hen.jpg", "input image path")
+		onnxModelPath   = flag.String("model", "data/VGG16.onnx", "ONNX model path")
+		synsetWordsPath = flag.String("synset-words", "data/synset_words.txt", "synset words file path")
 	)
 	flag.Parse()
 	fmt.Println("vgg16 example")

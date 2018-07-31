@@ -13,14 +13,14 @@ This tutorial shows making a basic application to load VGG16 model, input an ima
 Setup example data, see [gen_test_data.py](https://github.com/pfnet-research/menoh#run-test)
 
 ```
-data/
-  |- Light_sussex_hen.jpg
-  |- synset_words.txt
-  |- VGG16.onnx
 examples/
   |- vgg16
       |- main.go
       |- README.md (this tutorial)
+      |- data/
+          |- Light_sussex_hen.jpg
+          |- synset_words.txt
+          |- VGG16.onnx
 ```
 
 ## Setup in/out configuration

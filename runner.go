@@ -148,7 +148,7 @@ func (r *Runner) Run(inputs map[string]Tensor) error {
 			return fmt.Errorf("%s is not attached", n)
 		}
 		if err := updateArray(t, tensor); err != nil {
-			return err
+			return fmt.Errorf("cannot update array, %v", err)
 		}
 	}
 	return r.model.Run()
