@@ -1,3 +1,13 @@
+/*
+Package menoh provides a wrapper "runner" for Menoh library to execute ONNX
+model. It consits the following structures.
+
+Runner is a wrapper to manage an ONNX model and run with input variables.
+
+Config is information about ONNX model, required for making a runner.
+
+Tensor represents number array for in/out variable, similar to ONNX's Tensor.
+*/
 package menoh
 
 import (
@@ -7,7 +17,9 @@ import (
 	"github.com/pfnet-research/go-menoh/external"
 )
 
-// Runner setups Menoh model with profiling and executes.
+// Runner setups Menoh model with profiling and executes with input variables.
+// A runner supports to call Run (or RunWithTensor) method repeatedly until
+// stopping.
 type Runner struct {
 	modelData    *external.ModelData
 	vptBuilder   *external.VariableProfileTableBuilder
