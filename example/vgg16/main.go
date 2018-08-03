@@ -54,19 +54,19 @@ func main() {
 		Backend:       menoh.TypeMKLDNN,
 		BackendConfig: "",
 		Inputs: []menoh.InputConfig{
-			menoh.InputConfig{
+			{
 				Name:  conv1_1InName,
 				Dtype: menoh.TypeFloat,
 				Dims:  []int32{batch, channel, height, width},
 			},
 		},
 		Outputs: []menoh.OutputConfig{
-			menoh.OutputConfig{
+			{
 				Name:         fc6OutName,
 				Dtype:        menoh.TypeFloat,
 				FromInternal: true,
 			},
-			menoh.OutputConfig{
+			{
 				Name:         softmaxOutName,
 				Dtype:        menoh.TypeFloat,
 				FromInternal: false,
