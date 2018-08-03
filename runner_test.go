@@ -26,18 +26,18 @@ func getRunner() (*Runner, error) {
 		ONNXModelPath: onnxPath,
 		Backend:       TypeMKLDNN,
 		Inputs: []InputConfig{
-			InputConfig{
+			{
 				Name:  "input",
 				Dtype: TypeFloat,
 				Dims:  []int32{1, 3},
 			},
 		},
 		Outputs: []OutputConfig{
-			OutputConfig{
+			{
 				Name:  "fc1",
 				Dtype: TypeFloat,
 			},
-			OutputConfig{
+			{
 				Name:  "fc2",
 				Dtype: TypeFloat,
 			},
@@ -101,27 +101,27 @@ func TestNewRunner(t *testing.T) {
 		expected string
 	}
 	testSet := []testConfig{
-		testConfig{
+		{
 			name:     "setup with empty config",
 			config:   Config{},
 			expected: "invalid filename",
 		},
-		testConfig{
+		{
 			name:     "load invalid ONNX file name",
 			config:   Config{ONNXModelPath: ""},
 			expected: "invalid filename",
 		},
-		testConfig{
+		{
 			name:     "attach no input profile",
 			config:   Config{ONNXModelPath: onnxPath},
 			expected: "variable",
 		},
-		testConfig{
+		{
 			name: "attach invalid input profile",
 			config: Config{
 				ONNXModelPath: onnxPath,
 				Inputs: []InputConfig{
-					InputConfig{
+					{
 						Name:  "input",
 						Dtype: TypeFloat,
 						Dims:  []int32{1, 4},
@@ -130,20 +130,20 @@ func TestNewRunner(t *testing.T) {
 			},
 			expected: "dimension mismatch",
 		},
-		testConfig{
+		{
 			name: "attach invalid output name",
 			config: Config{
 				ONNXModelPath: onnxPath,
 				Inputs:        []InputConfig{inputConfig},
 				Outputs: []OutputConfig{
-					OutputConfig{
+					{
 						Name: "dummy_output",
 					},
 				},
 			},
 			expected: "variable",
 		},
-		testConfig{
+		{
 			name: "invalid backend",
 			config: Config{
 				ONNXModelPath: onnxPath,

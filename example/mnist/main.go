@@ -58,14 +58,14 @@ func makeRunner(modelPath string) (*menoh.Runner, error) {
 		ONNXModelPath: modelPath,
 		Backend:       menoh.TypeMKLDNN,
 		Inputs: []menoh.InputConfig{
-			menoh.InputConfig{
+			{
 				Name:  inputName,
 				Dtype: menoh.TypeFloat,
 				Dims:  []int32{batch, channel, height, width},
 			},
 		},
 		Outputs: []menoh.OutputConfig{
-			menoh.OutputConfig{
+			{
 				Name:         outputName,
 				Dtype:        menoh.TypeFloat,
 				FromInternal: false,
