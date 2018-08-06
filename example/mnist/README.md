@@ -1,8 +1,14 @@
 # MNIST Example
 
-This example follows [ONNX/models/MNIST](https://github.com/onnx/models/tree/master/mnist)
+This example follows [MNIST example](https://github.com/onnx/models/tree/master/mnist) provided by [ONNX models](https://github.com/onnx/models).
 
 ## Prepare
+
+### Requirements
+
+- [github.com/golang/protobuf/proto](https://github.com/golang/protobuf)
+
+### ONNX model and dataset
 
 Download dataset and extract.
 
