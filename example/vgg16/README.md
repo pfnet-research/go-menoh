@@ -6,7 +6,7 @@ This tutorial shows making a basic application to load VGG16 model, input an ima
 
 ### Requirements
 
-- [disintegration/imaging](https://github.com/disintegration/imaging)
+- [github.com/disintegration/imaging](https://github.com/disintegration/imaging)
 
 ### ONNX model and dataset
 

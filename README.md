@@ -1,5 +1,3 @@
-at 7/4/2018 13:00 renamed the repository name to **go-menoh** from menoh-go, following [recommended naming rule](https://github.com/golang/go/wiki/PackagePublishing)
-
 # Menoh Go
 
 [![Build Status](https://travis-ci.org/pfnet-research/go-menoh.svg?branch=master)](https://travis-ci.org/pfnet-research/go-menoh)
@@ -63,7 +61,11 @@ $ wget https://github.com/pfnet-research/menoh-rs/releases/download/assets/MLP.o
 $ go test ./...
 ```
 
-Additionally go-menoh follows `go vet` and `golint`.
+Additionally go-menoh follows `gofmt` with simplify option (`-s`), `go vet` and `golint`.
+
+## Note
+
+- At first name of this repository is "menoh-go", and renamed to "**go-menoh**" to follow [recommended naming rule](https://github.com/golang/go/wiki/PackagePublishing)
 
 ## License
 
