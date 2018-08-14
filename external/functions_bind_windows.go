@@ -1,6 +1,6 @@
 package external
 
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output functions_windows.go functions_bind_windows.go
+//go:generate go run converter/win_converter.go
 
 //sys MenohDeleteModelData(mdHandle uintptr) = menoh.menoh_delete_model_data
 //sys MenohMakeModelDataFromONNX(path string, mdHandle unsafe.Pointer) (err error) = menoh.menoh_make_model_data_from_onnx
