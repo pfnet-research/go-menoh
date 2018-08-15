@@ -34,8 +34,9 @@ func getRunner() (*Runner, error) {
 		},
 		Outputs: []OutputConfig{
 			{
-				Name:  "fc1",
-				Dtype: TypeFloat,
+				Name:         "fc1",
+				Dtype:        TypeFloat,
+				FromInternal: true,
 			},
 			{
 				Name:  "fc2",
@@ -277,6 +278,23 @@ func TestRunWithTensorAndGetOutput(t *testing.T) {
 			}
 		})
 	})
+
+	// fail
+	t.Run("run with invalid intput", func(t *testing.T) {
+		input := &FloatTensor{
+			Dims:  []int32{1, 2},
+			Array: []float32{0., 1.},
+		}
+		if err := runner.RunWithTensor("input", input); err == nil {
+			t.Error("an error should be occurred with non profiled input")
+		}
+	})
+	t.Run("put no-existed input", func(t *testing.T) {
+		input := &FloatTensor{}
+		if err := runner.RunWithTensor("dummy_input", input); err == nil {
+			t.Error("an error should be occurred with non profiled input")
+		}
+	})
 }
 
 func TestRunAndOutputs(t *testing.T) {
@@ -362,10 +380,10 @@ func tensorEquals(t1, t2 Tensor) bool {
 	}
 	switch t1.dtype() {
 	case TypeFloat:
-		t1f := t1.(*FloatTensor)
-		t2f := t2.(*FloatTensor)
-		for i := 0; i < t1.Size(); i++ {
-			if t1f.Array[i] != t2f.Array[i] {
+		t1f, _ := t1.FloatArray()
+		t2f, _ := t2.FloatArray()
+		for i, f := range t1f {
+			if t2f[i] != f {
 				return false
 			}
 		}
