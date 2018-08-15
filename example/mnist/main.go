@@ -1,16 +1,11 @@
 package main
 
 import (
-	"encoding/binary"
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"math"
 	"os"
 	"path/filepath"
-
-	"github.com/golang/protobuf/proto"
 
 	"github.com/pfnet-research/go-menoh"
 	"github.com/pfnet-research/go-menoh/tools/onnx"
@@ -103,18 +98,12 @@ func runAllTest(modelPath, dataPath string) error {
 }
 
 func runTest(runner *menoh.Runner, inputPath, outputPath string) error {
-	input, err := loadONNXTensor(inputPath)
+	// classify input array
+	input, err := getTensor(inputPath)
 	if err != nil {
 		return err
 	}
-
-	// classify input array
-	dims := input.GetDims()
-	inputTensor := &menoh.FloatTensor{
-		Dims:  []int32{int32(dims[0]), int32(dims[1]), int32(dims[2]), int32(dims[3])},
-		Array: convertToFloat32Array(input.GetRawData()),
-	}
-	if err := runner.RunWithTensor(inputName, inputTensor); err != nil {
+	if err := runner.RunWithTensor(inputName, input); err != nil {
 		return err
 	}
 
@@ -130,11 +119,14 @@ func runTest(runner *menoh.Runner, inputPath, outputPath string) error {
 	actualNum := argmax(actualArray)
 
 	// compare with expected output
-	expected, err := loadONNXTensor(outputPath)
+	expected, err := getTensor(outputPath)
 	if err != nil {
 		return err
 	}
-	expectedArray := convertToFloat32Array(expected.GetRawData())
+	expectedArray, err := expected.FloatArray()
+	if err != nil {
+		return err
+	}
 	expectedNum := argmax(expectedArray)
 	if actualNum != expectedNum {
 		return fmt.Errorf("expected is %d but actual is %d", expectedNum, actualNum)
@@ -142,27 +134,12 @@ func runTest(runner *menoh.Runner, inputPath, outputPath string) error {
 	return nil
 }
 
-func loadONNXTensor(path string) (*onnx.TensorProto, error) {
-	b, err := ioutil.ReadFile(path)
+func getTensor(path string) (menoh.Tensor, error) {
+	oTensor, err := onnx.LoadONNXTensorFromFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load '%s', %v", path, err)
+		return nil, err
 	}
-	tensor := &onnx.TensorProto{}
-	if err := proto.Unmarshal(b, tensor); err != nil {
-		return nil, fmt.Errorf("cannot convert to ONNX tensor, %v", err)
-	}
-	return tensor, nil
-}
-
-func convertToFloat32Array(raw []byte) []float32 {
-	bitLength := 4
-	length := len(raw) / bitLength
-	floats := make([]float32, length)
-	for i := 0; i < length; i++ {
-		bits := binary.LittleEndian.Uint32(raw[i*bitLength : (i+1)*bitLength])
-		floats[i] = math.Float32frombits(bits)
-	}
-	return floats
+	return onnx.ConvertToMenohTensor(oTensor)
 }
 
 func argmax(array []float32) int {
