@@ -2,6 +2,7 @@ package onnx
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
@@ -26,13 +27,9 @@ func TestLoadONNXTensorFromFile(t *testing.T) {
 			Dims:      []int64{1, 2, 3},
 			FloatData: []float32{0.1, 0.2, 0.3, 0.4, 0.5, 0.6},
 		}
-		expectedData, err := proto.Marshal(expected)
-		if err != nil {
-			t.Fatalf("cannot make test tensor binary, %v", err)
-		}
 		expectedDataPath := filepath.Join(tempDir, "test_tensor.pb")
-		if err := ioutil.WriteFile(expectedDataPath, expectedData, 0644); err != nil {
-			t.Fatalf("cannot save test tensor proto, %v", err)
+		if err := saveTensorProto(expected, expectedDataPath, false); err != nil {
+			t.Fatal(err)
 		}
 
 		actual, err := LoadONNXTensorFromFile(expectedDataPath)
@@ -42,32 +39,10 @@ func TestLoadONNXTensorFromFile(t *testing.T) {
 		if actual.GetDataType() != expected.GetDataType() {
 			t.Errorf("loaded datatype should be %v, but %v", expected.GetDataType(), actual.GetDataType())
 		}
-		arrayValueTest := true
-		if len(actual.GetFloatData()) == len(expected.GetFloatData()) {
-			for i, f := range actual.GetFloatData() {
-				if f != expected.GetFloatData()[i] {
-					arrayValueTest = false
-					break
-				}
-			}
-		} else {
-			arrayValueTest = false
-		}
-		if !arrayValueTest {
+		if !checkFloats(actual.GetFloatData(), expected.GetFloatData()) {
 			t.Errorf("loaded array should be %v, but %v", expected.GetFloatData(), actual.GetFloatData())
 		}
-		dimsTest := true
-		if len(actual.GetDims()) == len(expected.GetDims()) {
-			for i, d := range actual.GetDims() {
-				if d != expected.GetDims()[i] {
-					dimsTest = false
-					break
-				}
-			}
-		} else {
-			dimsTest = false
-		}
-		if !dimsTest {
+		if !checkInt64s(actual.GetDims(), expected.GetDims()) {
 			t.Errorf("loaded dims should be %v, but %v", expected.GetDims(), actual.GetDims())
 		}
 	})
@@ -90,13 +65,9 @@ func TestLoadONNXTensorFromFile(t *testing.T) {
 			Dims:      []int64{1, 2, 3},
 			FloatData: []float32{0.1, 0.2, 0.3, 0.4, 0.5, 0.6},
 		}
-		expectedData, err := proto.Marshal(expected)
-		if err != nil {
-			t.Fatalf("cannot make test tensor binary, %v", err)
-		}
-		expectedDataPath := filepath.Join(tempDir, "test_tensor_error.pb")
-		if err := ioutil.WriteFile(expectedDataPath, expectedData[:len(expectedData)-1], 0644); err != nil {
-			t.Fatalf("cannot save test tensor proto, %v", err)
+		expectedDataPath := filepath.Join(tempDir, "test_tensor.pb")
+		if err := saveTensorProto(expected, expectedDataPath, true); err != nil {
+			t.Fatal(err)
 		}
 
 		actual, err := LoadONNXTensorFromFile(expectedDataPath)
@@ -107,6 +78,44 @@ func TestLoadONNXTensorFromFile(t *testing.T) {
 			t.Errorf("loading tensor should be nil but get %v", actual)
 		}
 	})
+}
+
+func saveTensorProto(tensor *TensorProto, out string, broken bool) error {
+	tensorData, err := proto.Marshal(tensor)
+	if err != nil {
+		return fmt.Errorf("cannot make test tensor binary, %v", err)
+	}
+	if broken {
+		tensorData = tensorData[:len(tensorData)-1]
+	}
+	if err := ioutil.WriteFile(out, tensorData, 0644); err != nil {
+		return fmt.Errorf("cannot save test tensor proto, %v", err)
+	}
+	return nil
+}
+
+func checkFloats(f1, f2 []float32) bool {
+	if len(f1) != len(f2) {
+		return false
+	}
+	for i, f := range f1 {
+		if f != f2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func checkInt64s(i1, i2 []int64) bool {
+	if len(i1) != len(i2) {
+		return false
+	}
+	for i, d := range i1 {
+		if d != i2[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func TestConvertToMenohTensor(t *testing.T) {
@@ -129,15 +138,7 @@ func TestConvertToMenohTensor(t *testing.T) {
 		if err != nil {
 			t.Errorf("converted tensor should have float array, but %v", err)
 		}
-
-		arrayValueTest := true
-		for i, f := range floats {
-			if f != expectedFloats[i] {
-				arrayValueTest = false
-				break
-			}
-		}
-		if !arrayValueTest {
+		if !checkFloats(floats, expectedFloats) {
 			t.Errorf("converted array should be %v, but %v", expectedFloats, floats)
 		}
 	})
@@ -162,15 +163,7 @@ func TestConvertToMenohTensor(t *testing.T) {
 		if err != nil {
 			t.Errorf("converted tensor should have float array, but %v", err)
 		}
-
-		arrayValueTest := true
-		for i, f := range floats {
-			if f != expectedFloats[i] {
-				arrayValueTest = false
-				break
-			}
-		}
-		if !arrayValueTest {
+		if !checkFloats(floats, expectedFloats) {
 			t.Errorf("converted array should be %v, but %v", expectedFloats, floats)
 		}
 	})

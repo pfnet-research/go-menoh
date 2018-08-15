@@ -1,2 +1,2 @@
 ignore:
-  - "*.pb.go"
+  - "tools/onnx/onnx.pb.go"
