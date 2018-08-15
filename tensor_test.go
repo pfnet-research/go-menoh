@@ -1,7 +1,9 @@
 package menoh
 
 import (
+	"errors"
 	"testing"
+	"unsafe"
 )
 
 func TestUpdateArray(t *testing.T) {
@@ -23,6 +25,13 @@ func TestUpdateArray(t *testing.T) {
 			}
 		}
 	})
+	t.Run("update not same dtype", func(t *testing.T) {
+		src := &unknownDtypeTensor{}
+		dst := &FloatTensor{}
+		if err := updateArray(src, dst); err == nil {
+			t.Error("an error should be occurred")
+		}
+	})
 	t.Run("update not same size", func(t *testing.T) {
 		src := &FloatTensor{
 			Dims:  []int32{5},
@@ -36,6 +45,39 @@ func TestUpdateArray(t *testing.T) {
 			t.Error("an error should be occurred")
 		}
 	})
+	t.Run("update not supported dtype", func(t *testing.T) {
+		src := &unknownDtypeTensor{}
+		dst := &unknownDtypeTensor{}
+		if err := updateArray(src, dst); err == nil {
+			t.Error("an error should be occured")
+		}
+	})
+}
+
+type unknownDtypeTensor struct{}
+
+func (t *unknownDtypeTensor) ptr() unsafe.Pointer {
+	return nil
+}
+
+func (t *unknownDtypeTensor) dtype() TypeDtype {
+	return typeUnknownDtype
+}
+
+func (t *unknownDtypeTensor) Size() int {
+	return -1
+}
+
+func (t *unknownDtypeTensor) Shape() []int32 {
+	return []int32{}
+}
+
+func (t *unknownDtypeTensor) FloatArray() ([]float32, error) {
+	return []float32{}, errors.New("not implemented")
+}
+
+func (t *unknownDtypeTensor) WriteFloat(i int, f float32) error {
+	return errors.New("not implemented")
 }
 
 func TestFloatTensorWriteFloat(t *testing.T) {
