@@ -50,7 +50,7 @@ func TestFloatTensorWriteFloat(t *testing.T) {
 			t.Fatalf("updating should succeed, %v", err)
 		}
 		if tensor.Array[targetIdx] != expected {
-			t.Errorf("%d-th array is updated to %.1f, but %.1f",
+			t.Errorf("%d-th array should be updated to %.1f, but %.1f",
 				targetIdx, expected, tensor.Array[2])
 		}
 	})
