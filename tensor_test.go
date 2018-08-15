@@ -49,7 +49,7 @@ func TestUpdateArray(t *testing.T) {
 		src := &unknownDtypeTensor{}
 		dst := &unknownDtypeTensor{}
 		if err := updateArray(src, dst); err == nil {
-			t.Error("an error should be occured")
+			t.Error("an error should be occurred")
 		}
 	})
 }
