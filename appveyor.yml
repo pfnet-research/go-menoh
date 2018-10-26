@@ -4,8 +4,8 @@ platform:
 environment:
   global:
     GOPATH: c:\gopath
-    MKL_DNN_VER: "0.14"
-    MENOH_VER: "1.0.3"
+    MKL_DNN_VER: "0.16"
+    MENOH_VER: "1.1.1"
 
 install:
   - set PATH=C:\msys64\mingw64\bin;%PATH%
