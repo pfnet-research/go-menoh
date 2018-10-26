@@ -138,7 +138,8 @@ func TestNewRunner(t *testing.T) {
 				Inputs:        []InputConfig{inputConfig},
 				Outputs: []OutputConfig{
 					{
-						Name: "dummy_output",
+						Name:  "dummy_output",
+						Dtype: TypeFloat,
 					},
 				},
 			},

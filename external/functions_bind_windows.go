@@ -7,9 +7,8 @@ package external
 //sys MenohModelDataOptimize(mdHandle uintptr, vptHandle uintptr) (err error) = menoh.menoh_model_data_optimize
 //sys MenohDeleteVariableProfileTableBuilder(vptHandle uintptr) = menoh.menoh_delete_variable_profile_table_builder
 //sys MenohMakeVariableProfileTableBuilder(vptbHandle unsafe.Pointer) (err error) = menoh.menoh_make_variable_profile_table_builder
-//sys MenohVariableProfileTableBuilderAddInputProfileDims2(vptbHandle uintptr, name string, dtype int, dim1 int32, dim2 int32) (err error) = menoh.menoh_variable_profile_table_builder_add_input_profile_dims_2
-//sys MenohVariableProfileTableBuilderAddInputProfileDims4(vptbHandle uintptr, name string, dtype int, dim1 int32, dim2 int32, dim3 int32, dim4 int32) (err error) = menoh.menoh_variable_profile_table_builder_add_input_profile_dims_4
-//sys MenohVariableProfileTableBuilderAddoutputProfile(vptbHandle uintptr, name string, dtype int) (err error) = menoh.menoh_variable_profile_table_builder_add_output_profile
+//sys MenohVariableProfileTableBuilderAddInputProfile(vptbHandle uintptr, name string, dtype int, dimSize int, dims []int32) (err error) = menoh.menoh_variable_profile_table_builder_add_input_profile
+//sys MenohVariableProfileTableBuilderAddOutputName(vptbHandle uintptr, name string) (err error) = menoh.menoh_variable_profile_table_builder_add_output_name
 //sys MenohBuildVariableProfileTable(vptbHandle uintptr, mdHandle uintptr, vptHandle unsafe.Pointer) (err error) = menoh.menoh_build_variable_profile_table
 //sys MenohDeleteVariableProfileTable(vptHandle uintptr) = menoh.menoh_delete_variable_profile_table
 //sys MenohVariableProfileTableGetDtype(vptHandle uintptr, name string, dtypeHandle unsafe.Pointer) (err error) = menoh.menoh_variable_profile_table_get_dtype

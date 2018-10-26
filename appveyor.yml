@@ -1,11 +1,17 @@
+build: off
+
 platform:
 - x64
+
+clone_folder: c:\gopath\src\github.com\pfnet-research\go-menoh
 
 environment:
   global:
     GOPATH: c:\gopath
     MKL_DNN_VER: "0.16"
     MENOH_VER: "1.1.1"
+
+stack: go 1.10
 
 install:
   - set PATH=C:\msys64\mingw64\bin;%PATH%
