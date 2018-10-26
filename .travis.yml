@@ -25,7 +25,7 @@ before_install:
     sudo dpkg -i --force-depends *.deb
     sudo apt install -f
   # Test tool
-  - go get github.com/golang/lint/golint
+  - go get -u golang.org/x/lint/golint
 
 install:
   - go get -t -d -v ./...
