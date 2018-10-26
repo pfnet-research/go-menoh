@@ -15,7 +15,7 @@ install:
   - 7z x menoh.zip
   - set PATH=%APPVEYOR_BUILD_FOLDER%\mkl-dnn-%MKL_DNN_VER%-win64\lib;%APPVEYOR_BUILD_FOLDER%\menoh_prebuild_win_v%MENOH_VER%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
-  - go get github.com/golang/lint/golint
+  - go get -u golang.org/x/lint/golint
 
 build_script:
   - go get -t -d -v ./...
