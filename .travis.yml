@@ -20,10 +20,13 @@ before_install:
   - |
     sudo apt update
     curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_mkl-dnn_${MKL_DNN_VER}-1_amd64.deb
-    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh_${MKL_DNN_VER}-1_amd64.deb
-    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh-dev_${MKL_DNN_VER}-1_amd64.deb
+    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh_${MENOH_VER}-1_amd64.deb
+    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh-dev_${MENOH_VER}-1_amd64.deb
     sudo dpkg -i --force-depends *.deb
     sudo apt install -f
+  - export CPATH=/usr/include:$CPATH
+  - export LIBRARY_PATH=/usr/lib:$LIBRARY_PATH
+  - export LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH
   # Test tool
   - go get -u golang.org/x/lint/golint
 
