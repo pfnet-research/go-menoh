@@ -10,8 +10,9 @@ environment:
     GOPATH: c:\gopath
     MKL_DNN_VER: "0.16"
     MENOH_VER: "1.1.1"
-
-stack: go 1.10
+  matrix:
+    - stack: go 1.10
+    - stack: go 1.11
 
 install:
   - set PATH=C:\msys64\mingw64\bin;%PATH%
@@ -21,6 +22,7 @@ install:
   - 7z x menoh.zip
   - set PATH=%APPVEYOR_BUILD_FOLDER%\mkl-dnn-%MKL_DNN_VER%-win64\lib;%APPVEYOR_BUILD_FOLDER%\menoh_prebuild_win_v%MENOH_VER%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
+  - go version
   - go get -u golang.org/x/lint/golint
 
 build_script:
