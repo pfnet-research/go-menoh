@@ -3,7 +3,6 @@ package external
 import "C"
 import (
 	"errors"
-	"fmt"
 	"syscall"
 	"unsafe"
 )
@@ -53,24 +52,14 @@ func MakeVariableProfileTableBuilder() (*VariableProfileTableBuilder, error) {
 
 // AddInputProfile adds input profile with layer name, data type and dimension size.
 func (b *VariableProfileTableBuilder) AddInputProfile(name string, dtype TypeMenohDtype, dims ...int32) error {
-	switch dimLen := len(dims); dimLen {
-	case 2:
-		return checkError(
-			MenohVariableProfileTableBuilderAddInputProfileDims2(
-				b.h, name, int(dtype), dims[0], dims[1]))
-	case 4:
-		return checkError(
-			MenohVariableProfileTableBuilderAddInputProfileDims4(
-				b.h, name, int(dtype), dims[0], dims[1], dims[2], dims[3]))
-	default:
-		return fmt.Errorf("dimension size %d is not supported", dimLen)
-	}
+	return checkError(MenohVariableProfileTableBuilderAddInputProfile(
+		b.h, name, int(dtype), len(dims), dims))
 }
 
 // AddOutputProfile adds output profile with layer name and data type.
 func (b *VariableProfileTableBuilder) AddOutputProfile(name string, dtype TypeMenohDtype) error {
 	return checkError(
-		MenohVariableProfileTableBuilderAddoutputProfile(b.h, name, int(dtype)))
+		MenohVariableProfileTableBuilderAddOutputName(b.h, name))
 }
 
 // BuildVariableProfileTable returns VariableProfileTable.
@@ -244,7 +233,13 @@ const (
 	typeUnsupportedOperator
 	typeFailedToConfigureOperator
 	typeBackendError
-	typeSameNameVariableAlreadyExist
+	typeSameNamedVariableAlreadyExist
+	typeUnsupportedInputDims
+	typeSameNamedParameterAlreadyExist
+	typeSameNamedAttributeAlreadyExist
+	typeInvalidBackendConfigError
+	typeInputNotFoundError
+	typeOutputNotFoundError
 )
 
 func (e typeMenohError) String() string {
@@ -283,8 +278,20 @@ func (e typeMenohError) String() string {
 		return "failed to configure operator"
 	case typeBackendError:
 		return "backend error"
-	case typeSameNameVariableAlreadyExist:
-		return "save name variable already exist"
+	case typeSameNamedVariableAlreadyExist:
+		return "same named variable already exist"
+	case typeUnsupportedInputDims:
+		return "unsupported input dims"
+	case typeSameNamedParameterAlreadyExist:
+		return "same named parameter already exist"
+	case typeSameNamedAttributeAlreadyExist:
+		return "same named attribute already exist"
+	case typeInvalidBackendConfigError:
+		return "invalid backend config"
+	case typeInputNotFoundError:
+		return "input not found"
+	case typeOutputNotFoundError:
+		return "output not found"
 	default:
 		return "unknown type error"
 	}

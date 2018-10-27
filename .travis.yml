@@ -7,64 +7,28 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
       - sourceline: 'ppa:maarten-fonville/protobuf'
-    packages:
-      - gcc-7
-      - g++-7
-      - libprotobuf-dev
-      - protobuf-compiler
-
-sudo: false
 
 notifications:
   email: false
 
 env:
   global:
-    - MKL_DNN_VER: "0.14"
-    - MENOH_VER: "1.0.3"
-
-cache:
-  directories:
-  - $HOME/mkl-dnn-${MKL_DNN_VER}
-  - $HOME/menoh-${MENOH_VER}
+    - MKL_DNN_VER: "0.16"
+    - MENOH_VER: "1.1.1"
 
 before_install:
-  # MKL_DNN
   - |
-    if [ ! -d "$HOME/mkl-dnn-${MKL_DNN_VER}/lib" ]; then
-      wget https://github.com/intel/mkl-dnn/archive/v${MKL_DNN_VER}.tar.gz -O mkl-dnn.tar.gz
-      tar xfz mkl-dnn.tar.gz && mv mkl-dnn-${MKL_DNN_VER} mkl-dnn
-      cd mkl-dnn/scripts && bash ./prepare_mkl.sh && cd ..
-      mkdir -p build && cd build && cmake -DCMAKE_INSTALL_PREFIX=$HOME/mkl-dnn-${MKL_DNN_VER} .. && make
-      make install
-      cd ../..
-    else
-      echo "Using cached directory"
-    fi
-  # Menoh
-  - |
-    if [ ! -d "$HOME/menoh-${MENOH_VER}/lib" ]; then
-      export CXX="g++-7" CC="gcc-7"
-      git clone -b v${MENOH_VER} https://github.com/pfnet-research/menoh.git
-      cd menoh
-      mkdir -p build && cd build
-      cmake \
-        -DENABLE_TEST=OFF -DENABLE_BENCHMARK=OFF -DENABLE_EXAMPLE=OFF -DENABLE_TOOL=OFF \
-        -DMKLDNN_INCLUDE_DIR="$HOME/mkl-dnn-${MKL_DNN_VER}/include" \
-        -DMKLDNN_LIBRARY="$HOME/mkl-dnn-${MKL_DNN_VER}/lib/libmkldnn.so" \
-        -DCMAKE_INSTALL_PREFIX=$HOME/menoh-${MENOH_VER} \
-        ..
-      make
-      make install
-      cd ../..
-    else
-      echo "Using cached directory"
-    fi
-  - export CPATH=$HOME/menoh-${MENOH_VER}/include:$HOME/mkl-dnn-${MKL_DNN_VER}/include:$CPATH
-  - export LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LIBRARY_PATH
-  - export LD_LIBRARY_PATH=$HOME/menoh-${MENOH_VER}/lib:$HOME/mkl-dnn-${MKL_DNN_VER}/lib:$LD_LIBRARY_PATH
+    sudo apt update
+    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_mkl-dnn_${MKL_DNN_VER}-1_amd64.deb
+    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh_${MENOH_VER}-1_amd64.deb
+    curl -LO https://github.com/pfnet-research/menoh/releases/download/v${MENOH_VER}/ubuntu1404_menoh-dev_${MENOH_VER}-1_amd64.deb
+    sudo dpkg -i --force-depends *.deb
+    sudo apt install -f
+  - export CPATH=/usr/include:$CPATH
+  - export LIBRARY_PATH=/usr/lib:$LIBRARY_PATH
+  - export LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH
   # Test tool
-  - go get github.com/golang/lint/golint
+  - go get -u golang.org/x/lint/golint
 
 install:
   - go get -t -d -v ./...

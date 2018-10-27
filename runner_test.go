@@ -115,7 +115,7 @@ func TestNewRunner(t *testing.T) {
 		{
 			name:     "attach no input profile",
 			config:   Config{ONNXModelPath: onnxPath},
-			expected: "variable",
+			expected: "variable not found",
 		},
 		{
 			name: "attach invalid input profile",
@@ -138,11 +138,12 @@ func TestNewRunner(t *testing.T) {
 				Inputs:        []InputConfig{inputConfig},
 				Outputs: []OutputConfig{
 					{
-						Name: "dummy_output",
+						Name:  "dummy_output",
+						Dtype: TypeFloat,
 					},
 				},
 			},
-			expected: "variable",
+			expected: "output not found",
 		},
 		{
 			name: "invalid backend",
