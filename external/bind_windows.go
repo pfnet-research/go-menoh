@@ -26,6 +26,15 @@ func MakeModelDataFromONNX(path string) (*ModelData, error) {
 	return &ModelData{h: h}, nil
 }
 
+// MakeModelDataFromONNXBytes return ModelData with ONNX file byte data.
+func MakeModelDataFromONNXBytes(data []byte) (*ModelData, error) {
+	var h uintptr
+	if err := checkError(MenohMakeModelDataFromONNXBytes(data, unsafe.Pointer(&h))); err != nil {
+		return nil, err
+	}
+	return &ModelData{h: h}, nil
+}
+
 // Optimize ModelData with profiling table.
 func (m *ModelData) Optimize(table VariableProfileTable) error {
 	return checkError(MenohModelDataOptimize(m.h, table.h))

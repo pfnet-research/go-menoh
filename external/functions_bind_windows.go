@@ -4,6 +4,7 @@ package external
 
 //sys MenohDeleteModelData(mdHandle uintptr) = menoh.menoh_delete_model_data
 //sys MenohMakeModelDataFromONNX(path string, mdHandle unsafe.Pointer) (err error) = menoh.menoh_make_model_data_from_onnx
+//sys MenohMakeModelDataFromONNXBytes(data []byte, mdHandle unsafe.Pointer) (err error) = menoh.menoh_make_model_data_from_onnx_data_on_memory
 //sys MenohModelDataOptimize(mdHandle uintptr, vptHandle uintptr) (err error) = menoh.menoh_model_data_optimize
 //sys MenohDeleteVariableProfileTableBuilder(vptHandle uintptr) = menoh.menoh_delete_variable_profile_table_builder
 //sys MenohMakeVariableProfileTableBuilder(vptbHandle unsafe.Pointer) (err error) = menoh.menoh_make_variable_profile_table_builder
