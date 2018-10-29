@@ -35,11 +35,34 @@ type Runner struct {
 
 // NewRunner returns Runner using configuration, the runner setup Menoh model
 // and ready for execution. Require to call Stop function after the process is done.
-func NewRunner(conf Config) (runner *Runner, err error) {
+func NewRunner(conf Config) (*Runner, error) {
+	modelData, err := external.MakeModelDataFromONNX(conf.ONNXModelPath)
+	if err != nil {
+		return nil, err
+	}
+	return buildRunner(modelData, conf)
+}
+
+// NewRunnerWithONNXBytes returns Runner using configuration and ONNX model.
+// The ONNX model is passed on memory, not use conf.ONNXModelPath.
+// Spec of a returned runner is same as NewRunner, see docs of the function.
+func NewRunnerWithONNXBytes(onnx []byte, conf Config) (*Runner, error) {
+	if len(onnx) == 0 {
+		return nil, fmt.Errorf("ONNX file data is empty")
+	}
+	modelData, err := external.MakeModelDataFromONNXBytes(onnx)
+	if err != nil {
+		return nil, err
+	}
+	return buildRunner(modelData, conf)
+}
+
+func buildRunner(modelData *external.ModelData, conf Config) (runner *Runner, err error) {
 	runner = &Runner{
-		conf:    conf,
-		inputs:  map[string]Tensor{},
-		outputs: map[string]Tensor{},
+		modelData: modelData,
+		conf:      conf,
+		inputs:    map[string]Tensor{},
+		outputs:   map[string]Tensor{},
 	}
 	defer func() {
 		if err != nil {
@@ -47,12 +70,6 @@ func NewRunner(conf Config) (runner *Runner, err error) {
 			runner = nil
 		}
 	}()
-
-	modelData, err := external.MakeModelDataFromONNX(conf.ONNXModelPath)
-	if err != nil {
-		return
-	}
-	runner.modelData = modelData
 
 	vptBuilder, err := external.MakeVariableProfileTableBuilder()
 	if err != nil {

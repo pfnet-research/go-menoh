@@ -2,23 +2,33 @@ package menoh
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func getONNXFilepath() (string, error) {
+func getTestONNXDataset() (string, InputConfig, OutputConfig, error) {
 	onnxPath := filepath.Join("test_data", "MLP.onnx")
 	if _, err := os.Stat(onnxPath); err != nil {
-		return "", fmt.Errorf(
+		return "", InputConfig{}, OutputConfig{}, fmt.Errorf(
 			"ONNX file is not found, please put the file to %v", onnxPath)
 	}
-	return onnxPath, nil
+	inputConfig := InputConfig{
+		Name:  "input",
+		Dtype: TypeFloat,
+		Dims:  []int32{1, 3},
+	}
+	outputConfig := OutputConfig{
+		Name:  "fc2",
+		Dtype: TypeFloat,
+	}
+	return onnxPath, inputConfig, outputConfig, nil
 }
 
 func getRunner() (*Runner, error) {
-	onnxPath, err := getONNXFilepath()
+	onnxPath, _, _, err := getTestONNXDataset()
 	if err != nil {
 		return nil, err
 	}
@@ -47,21 +57,11 @@ func getRunner() (*Runner, error) {
 	return NewRunner(conf)
 }
 
-func TestNewRunner(t *testing.T) {
-	onnxPath, err := getONNXFilepath()
+func TestNewRunnerSuccess(t *testing.T) {
+	onnxPath, inputConfig, outputConfig, err := getTestONNXDataset()
 	if err != nil {
 		t.Fatal(err)
 	}
-	inputConfig := InputConfig{
-		Name:  "input",
-		Dtype: TypeFloat,
-		Dims:  []int32{1, 3},
-	}
-	outputConfig := OutputConfig{
-		Name:  "fc2",
-		Dtype: TypeFloat,
-	}
-
 	// success
 	t.Run("load valid ONNX model without output", func(t *testing.T) {
 		conf := Config{
@@ -94,11 +94,36 @@ func TestNewRunner(t *testing.T) {
 		}
 		defer runner.Stop()
 	})
+	t.Run("load valid ONNX model", func(t *testing.T) {
+		onnxData, err := ioutil.ReadFile(onnxPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		conf := Config{
+			Backend: TypeMKLDNN,
+			Inputs:  []InputConfig{inputConfig},
+		}
+		runner, err := NewRunnerWithONNXBytes(onnxData, conf)
+		if err != nil {
+			t.Errorf("runner should be created without error, %v", err)
+		}
+		if runner == nil {
+			t.Fatal("runner should be created")
+		}
+		defer runner.Stop()
+	})
+}
 
+func TestNewRunnerFail(t *testing.T) {
+	onnxPath, inputConfig, outputConfig, err := getTestONNXDataset()
+	if err != nil {
+		t.Fatal(err)
+	}
 	// fail
 	type testConfig struct {
 		name     string
 		config   Config
+		data     []byte
 		expected string
 	}
 	testSet := []testConfig{
@@ -111,6 +136,18 @@ func TestNewRunner(t *testing.T) {
 			name:     "load invalid ONNX file name",
 			config:   Config{ONNXModelPath: ""},
 			expected: "invalid filename",
+		},
+		{
+			name:     "load empty bytes",
+			config:   Config{},
+			data:     []byte{},
+			expected: "data is empty",
+		},
+		{
+			name:     "load invalid bytes",
+			config:   Config{},
+			data:     []byte("dummy_data"),
+			expected: "parse error",
 		},
 		{
 			name:     "attach no input profile",
@@ -158,7 +195,13 @@ func TestNewRunner(t *testing.T) {
 	for _, ts := range testSet {
 		name, config, expected := ts.name, ts.config, ts.expected
 		t.Run(name, func(t *testing.T) {
-			runner, err := NewRunner(config)
+			var runner *Runner
+			var err error
+			if ts.data != nil {
+				runner, err = NewRunnerWithONNXBytes(ts.data, config)
+			} else {
+				runner, err = NewRunner(config)
+			}
 			if err != nil {
 				if !strings.Contains(fmt.Sprintf("%v", err), expected) {
 					t.Errorf(`error message should contain expected phrase

@@ -39,6 +39,7 @@ var (
 
 	procmenoh_delete_model_data                                = modmenoh.NewProc("menoh_delete_model_data")
 	procmenoh_make_model_data_from_onnx                        = modmenoh.NewProc("menoh_make_model_data_from_onnx")
+	procmenoh_make_model_data_from_onnx_data_on_memory         = modmenoh.NewProc("menoh_make_model_data_from_onnx_data_on_memory")
 	procmenoh_model_data_optimize                              = modmenoh.NewProc("menoh_model_data_optimize")
 	procmenoh_delete_variable_profile_table_builder            = modmenoh.NewProc("menoh_delete_variable_profile_table_builder")
 	procmenoh_make_variable_profile_table_builder              = modmenoh.NewProc("menoh_make_variable_profile_table_builder")
@@ -78,6 +79,18 @@ func MenohMakeModelDataFromONNX(path string, mdHandle unsafe.Pointer) (err error
 
 func _MenohMakeModelDataFromONNX(path *byte, mdHandle unsafe.Pointer) (err error) {
 	r1, _, _ := syscall.Syscall(procmenoh_make_model_data_from_onnx.Addr(), 2, uintptr(unsafe.Pointer(path)), uintptr(mdHandle), 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohMakeModelDataFromONNXBytes(data []byte, mdHandle unsafe.Pointer) (err error) {
+	var _p0 *byte
+	if len(data) > 0 {
+		_p0 = &data[0]
+	}
+	r1, _, _ := syscall.Syscall(procmenoh_make_model_data_from_onnx_data_on_memory.Addr(), 3, uintptr(unsafe.Pointer(_p0)), uintptr(len(data)), uintptr(mdHandle))
 	if r1 != 0 {
 		err = errnoErr(syscall.Errno(r1))
 	}
