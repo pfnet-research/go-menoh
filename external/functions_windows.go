@@ -40,6 +40,15 @@ var (
 	procmenoh_delete_model_data                                = modmenoh.NewProc("menoh_delete_model_data")
 	procmenoh_make_model_data_from_onnx                        = modmenoh.NewProc("menoh_make_model_data_from_onnx")
 	procmenoh_make_model_data_from_onnx_data_on_memory         = modmenoh.NewProc("menoh_make_model_data_from_onnx_data_on_memory")
+	procmenoh_make_model_data                                  = modmenoh.NewProc("menoh_make_model_data")
+	procmenoh_model_data_add_parameter                         = modmenoh.NewProc("menoh_model_data_add_parameter")
+	procmenoh_model_data_add_new_node                          = modmenoh.NewProc("menoh_model_data_add_new_node")
+	procmenoh_model_data_add_input_name_to_current_node        = modmenoh.NewProc("menoh_model_data_add_input_name_to_current_node")
+	procmenoh_model_data_add_output_name_to_current_node       = modmenoh.NewProc("menoh_model_data_add_output_name_to_current_node")
+	procmenoh_model_data_add_attribute_int_to_current_node     = modmenoh.NewProc("menoh_model_data_add_attribute_int_to_current_node")
+	procmenoh_model_data_add_attribute_float_to_current_node   = modmenoh.NewProc("menoh_model_data_add_attribute_float_to_current_node")
+	procmenoh_model_data_add_attribute_ints_to_current_node    = modmenoh.NewProc("menoh_model_data_add_attribute_ints_to_current_node")
+	procmenoh_model_data_add_attribute_floats_to_current_node  = modmenoh.NewProc("menoh_model_data_add_attribute_floats_to_current_node")
 	procmenoh_model_data_optimize                              = modmenoh.NewProc("menoh_model_data_optimize")
 	procmenoh_delete_variable_profile_table_builder            = modmenoh.NewProc("menoh_delete_variable_profile_table_builder")
 	procmenoh_make_variable_profile_table_builder              = modmenoh.NewProc("menoh_make_variable_profile_table_builder")
@@ -97,6 +106,162 @@ func MenohMakeModelDataFromONNXBytes(data []byte, mdHandle unsafe.Pointer) (err 
 	return
 }
 
+func MenohMakeModelData(mdHandle unsafe.Pointer) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_make_model_data.Addr(), 1, uintptr(mdHandle), 0, 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddParameter(mdHandle uintptr, name string, dtype int, dims []int32, buffer unsafe.Pointer) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(name)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddParameter(mdHandle, _p0, dtype, dims, buffer)
+}
+
+func _MenohModelDataAddParameter(mdHandle uintptr, name *byte, dtype int, dims []int32, buffer unsafe.Pointer) (err error) {
+	var _p1 *int32
+	if len(dims) > 0 {
+		_p1 = &dims[0]
+	}
+	r1, _, _ := syscall.Syscall6(procmenoh_model_data_add_parameter.Addr(), 6, uintptr(mdHandle), uintptr(unsafe.Pointer(name)), uintptr(dtype), uintptr(len(dims)), uintptr(unsafe.Pointer(_p1)), uintptr(buffer))
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddNewNode(mdHandle uintptr, opType string) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(opType)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddNewNode(mdHandle, _p0)
+}
+
+func _MenohModelDataAddNewNode(mdHandle uintptr, opType *byte) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_model_data_add_new_node.Addr(), 2, uintptr(mdHandle), uintptr(unsafe.Pointer(opType)), 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddInputNameToCurrentNode(mdHandle uintptr, intputName string) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(intputName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddInputNameToCurrentNode(mdHandle, _p0)
+}
+
+func _MenohModelDataAddInputNameToCurrentNode(mdHandle uintptr, intputName *byte) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_model_data_add_input_name_to_current_node.Addr(), 2, uintptr(mdHandle), uintptr(unsafe.Pointer(intputName)), 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddOutputNameToCurrentNode(mdHandle uintptr, outputName string) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(outputName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddOutputNameToCurrentNode(mdHandle, _p0)
+}
+
+func _MenohModelDataAddOutputNameToCurrentNode(mdHandle uintptr, outputName *byte) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_model_data_add_output_name_to_current_node.Addr(), 2, uintptr(mdHandle), uintptr(unsafe.Pointer(outputName)), 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddAttributeIntToCurrentNode(mdHandle uintptr, attributeName string, value int) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(attributeName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddAttributeIntToCurrentNode(mdHandle, _p0, value)
+}
+
+func _MenohModelDataAddAttributeIntToCurrentNode(mdHandle uintptr, attributeName *byte, value int) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_model_data_add_attribute_int_to_current_node.Addr(), 3, uintptr(mdHandle), uintptr(unsafe.Pointer(attributeName)), uintptr(value))
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddAttributeFloatToCurrentNode(mdHandle uintptr, attributeName string, value float32) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(attributeName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddAttributeFloatToCurrentNode(mdHandle, _p0, value)
+}
+
+func _MenohModelDataAddAttributeFloatToCurrentNode(mdHandle uintptr, attributeName *byte, value float32) (err error) {
+	r1, _, _ := syscall.Syscall(procmenoh_model_data_add_attribute_float_to_current_node.Addr(), 3, uintptr(mdHandle), uintptr(unsafe.Pointer(attributeName)), uintptr(value))
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddAttributeIntsToCurrentNode(mdHandle uintptr, attributeName string, values []int) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(attributeName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddAttributeIntsToCurrentNode(mdHandle, _p0, values)
+}
+
+func _MenohModelDataAddAttributeIntsToCurrentNode(mdHandle uintptr, attributeName *byte, values []int) (err error) {
+	var _p1 *int
+	if len(values) > 0 {
+		_p1 = &values[0]
+	}
+	r1, _, _ := syscall.Syscall6(procmenoh_model_data_add_attribute_ints_to_current_node.Addr(), 4, uintptr(mdHandle), uintptr(unsafe.Pointer(attributeName)), uintptr(len(values)), uintptr(unsafe.Pointer(_p1)), 0, 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
+func MenohModelDataAddAttributeFloatsToCurrentNode(mdHandle uintptr, attributeName string, values []float32) (err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(attributeName)
+	if err != nil {
+		return
+	}
+	return _MenohModelDataAddAttributeFloatsToCurrentNode(mdHandle, _p0, values)
+}
+
+func _MenohModelDataAddAttributeFloatsToCurrentNode(mdHandle uintptr, attributeName *byte, values []float32) (err error) {
+	var _p1 *float32
+	if len(values) > 0 {
+		_p1 = &values[0]
+	}
+	r1, _, _ := syscall.Syscall6(procmenoh_model_data_add_attribute_floats_to_current_node.Addr(), 4, uintptr(mdHandle), uintptr(unsafe.Pointer(attributeName)), uintptr(len(values)), uintptr(unsafe.Pointer(_p1)), 0, 0)
+	if r1 != 0 {
+		err = errnoErr(syscall.Errno(r1))
+	}
+	return
+}
+
 func MenohModelDataOptimize(mdHandle uintptr, vptHandle uintptr) (err error) {
 	r1, _, _ := syscall.Syscall(procmenoh_model_data_optimize.Addr(), 2, uintptr(mdHandle), uintptr(vptHandle), 0)
 	if r1 != 0 {
@@ -118,21 +283,21 @@ func MenohMakeVariableProfileTableBuilder(vptbHandle unsafe.Pointer) (err error)
 	return
 }
 
-func MenohVariableProfileTableBuilderAddInputProfile(vptbHandle uintptr, name string, dtype int, dimSize int, dims []int32) (err error) {
+func MenohVariableProfileTableBuilderAddInputProfile(vptbHandle uintptr, name string, dtype int, dims []int32) (err error) {
 	var _p0 *byte
 	_p0, err = syscall.BytePtrFromString(name)
 	if err != nil {
 		return
 	}
-	return _MenohVariableProfileTableBuilderAddInputProfile(vptbHandle, _p0, dtype, dimSize, dims)
+	return _MenohVariableProfileTableBuilderAddInputProfile(vptbHandle, _p0, dtype, dims)
 }
 
-func _MenohVariableProfileTableBuilderAddInputProfile(vptbHandle uintptr, name *byte, dtype int, dimSize int, dims []int32) (err error) {
+func _MenohVariableProfileTableBuilderAddInputProfile(vptbHandle uintptr, name *byte, dtype int, dims []int32) (err error) {
 	var _p1 *int32
 	if len(dims) > 0 {
 		_p1 = &dims[0]
 	}
-	r1, _, _ := syscall.Syscall6(procmenoh_variable_profile_table_builder_add_input_profile.Addr(), 6, uintptr(vptbHandle), uintptr(unsafe.Pointer(name)), uintptr(dtype), uintptr(dimSize), uintptr(unsafe.Pointer(_p1)), uintptr(len(dims)))
+	r1, _, _ := syscall.Syscall6(procmenoh_variable_profile_table_builder_add_input_profile.Addr(), 5, uintptr(vptbHandle), uintptr(unsafe.Pointer(name)), uintptr(dtype), uintptr(len(dims)), uintptr(unsafe.Pointer(_p1)), 0)
 	if r1 != 0 {
 		err = errnoErr(syscall.Errno(r1))
 	}

@@ -35,6 +35,56 @@ func MakeModelDataFromONNXBytes(data []byte) (*ModelData, error) {
 	return &ModelData{h: h}, nil
 }
 
+// MakeModelData returns empty ModelData object, to build manually.
+func MakeModelData() (*ModelData, error) {
+	var h uintptr
+	if err := checkError(MenohMakeModelData(unsafe.Pointer(&h))); err != nil {
+		return nil, err
+	}
+	return &ModelData{h: h}, nil
+}
+
+// AddParameter adds named parameter.
+func (m *ModelData) AddParameter(name string, param Variable) error {
+	return checkError(MenohModelDataAddParameter(
+		m.h, name, int(param.Dtype), param.Dims, param.BufferHandle))
+}
+
+// AddNewNode adds new opType.
+func (m *ModelData) AddNewNode(opType string) error {
+	return checkError(MenohModelDataAddNewNode(m.h, opType))
+}
+
+// AddInputNameToCurrentNode adds input name to current node.
+func (m *ModelData) AddInputNameToCurrentNode(inputName string) error {
+	return checkError(MenohModelDataAddInputNameToCurrentNode(m.h, inputName))
+}
+
+// AddOutputNameToCurrentNode adds output name to current node.
+func (m *ModelData) AddOutputNameToCurrentNode(outputName string) error {
+	return checkError(MenohModelDataAddOutputNameToCurrentNode(m.h, outputName))
+}
+
+// AddAttributeIntToCurrentNode adds integer type attribute to current node.
+func (m *ModelData) AddAttributeIntToCurrentNode(attributeName string, value int) error {
+	return checkError(MenohModelDataAddAttributeIntToCurrentNode(m.h, attributeName, value))
+}
+
+// AddAttributeFloatToCurrentNode adds float type attribute to current node.
+func (m *ModelData) AddAttributeFloatToCurrentNode(attributeName string, value float32) error {
+	return checkError(MenohModelDataAddAttributeFloatToCurrentNode(m.h, attributeName, value))
+}
+
+// AddAttributeIntsToCurrentNode adds int array type attribute to current node.
+func (m *ModelData) AddAttributeIntsToCurrentNode(attributeName string, value []int) error {
+	return checkError(MenohModelDataAddAttributeIntsToCurrentNode(m.h, attributeName, value))
+}
+
+// AddAttributeFloatsToCurrentNode adds float array type attribute to current node.
+func (m *ModelData) AddAttributeFloatsToCurrentNode(attributeName string, value []float32) error {
+	return checkError(MenohModelDataAddAttributeFloatsToCurrentNode(m.h, attributeName, value))
+}
+
 // Optimize ModelData with profiling table.
 func (m *ModelData) Optimize(table VariableProfileTable) error {
 	return checkError(MenohModelDataOptimize(m.h, table.h))
@@ -61,8 +111,7 @@ func MakeVariableProfileTableBuilder() (*VariableProfileTableBuilder, error) {
 
 // AddInputProfile adds input profile with layer name, data type and dimension size.
 func (b *VariableProfileTableBuilder) AddInputProfile(name string, dtype TypeMenohDtype, dims ...int32) error {
-	return checkError(MenohVariableProfileTableBuilderAddInputProfile(
-		b.h, name, int(dtype), len(dims), dims))
+	return checkError(MenohVariableProfileTableBuilderAddInputProfile(b.h, name, int(dtype), dims))
 }
 
 // AddOutputProfile adds output profile with layer name and data type.
