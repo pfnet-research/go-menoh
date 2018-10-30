@@ -48,6 +48,75 @@ func MakeModelDataFromONNXBytes(data []byte) (*ModelData, error) {
 	return &ModelData{h: h}, nil
 }
 
+// MakeModelData returns empty ModelData object, to build manually.
+func MakeModelData() (*ModelData, error) {
+	var h C.menoh_model_data_handle
+	if err := checkError(C.menoh_make_model_data(&h)); err != nil {
+		return nil, err
+	}
+	return &ModelData{h: h}, nil
+}
+
+// AddParameter adds named parameter.
+func (m *ModelData) AddParameter(name string, param Variable) error {
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_parameter(
+		m.h, cName, C.int(param.Dtype), C.int(len(param.Dims)),
+		(*C.int)(unsafe.Pointer(&param.Dims[0])), param.BufferHandle))
+}
+
+// AddNewNode adds new opType.
+func (m *ModelData) AddNewNode(opType string) error {
+	cName := C.CString(opType)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_new_node(m.h, cName))
+}
+
+// AddInputNameToCurrentNode adds input name to current node.
+func (m *ModelData) AddInputNameToCurrentNode(inputName string) error {
+	cName := C.CString(inputName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_input_name_to_current_node(m.h, cName))
+}
+
+// AddOutputNameToCurrentNode adds output name to current node.
+func (m *ModelData) AddOutputNameToCurrentNode(outputName string) error {
+	cName := C.CString(outputName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_output_name_to_current_node(m.h, cName))
+}
+
+// AddAttributeIntToCurrentNode adds integer type attribute to current node.
+func (m *ModelData) AddAttributeIntToCurrentNode(attributeName string, value int) error {
+	cName := C.CString(attributeName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_attribute_int_to_current_node(m.h, cName, C.int(value)))
+}
+
+// AddAttributeFloatToCurrentNode adds float type attribute to current node.
+func (m *ModelData) AddAttributeFloatToCurrentNode(attributeName string, value float32) error {
+	cName := C.CString(attributeName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_attribute_float_to_current_node(m.h, cName, C.float(value)))
+}
+
+// AddAttributeIntsToCurrentNode adds int array type attribute to current node.
+func (m *ModelData) AddAttributeIntsToCurrentNode(attributeName string, values []int) error {
+	cName := C.CString(attributeName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_attribute_ints_to_current_node(
+		m.h, cName, C.int(len(values)), (*C.int)(unsafe.Pointer(&values[0]))))
+}
+
+// AddAttributeFloatsToCurrentNode adds float array type attribute to current node.
+func (m *ModelData) AddAttributeFloatsToCurrentNode(attributeName string, values []float32) error {
+	cName := C.CString(attributeName)
+	defer C.free(unsafe.Pointer(cName))
+	return checkError(C.menoh_model_data_add_attribute_floats_to_current_node(
+		m.h, cName, C.int(len(values)), (*C.float)(unsafe.Pointer(&values[0]))))
+}
+
 // Optimize ModelData with profiling table.
 func (m *ModelData) Optimize(table VariableProfileTable) error {
 	return checkError(C.menoh_model_data_optimize(m.h, table.h))
