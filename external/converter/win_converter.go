@@ -47,6 +47,14 @@ func convert(generated string) string {
 		`windows.NewLazySystemDLL("menoh.dll")`,
 		`syscall.NewLazyDLL("menoh.dll")`, 1)
 
+	// Menoh is designed size -> pointer order.
+	replaced = strings.Replace(replaced,
+		`uintptr(unsafe.Pointer(_p1)), uintptr(len(dims))`,
+		`uintptr(len(dims)), uintptr(unsafe.Pointer(_p1))`, -1)
+	replaced = strings.Replace(replaced,
+		`uintptr(unsafe.Pointer(_p1)), uintptr(len(values))`,
+		`uintptr(len(values)), uintptr(unsafe.Pointer(_p1))`, -1)
+
 	replaced = strings.Replace(replaced,
 		"r1, _, e1 := syscall.Syscall",
 		"r1, _, _ := syscall.Syscall", -1)
