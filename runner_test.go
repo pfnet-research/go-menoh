@@ -99,11 +99,15 @@ func TestNewRunnerSuccess(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		modelData, err := NewModelDataFromBytes(onnxData)
+		if err != nil {
+			t.Fatal(err)
+		}
 		conf := Config{
 			Backend: TypeMKLDNN,
 			Inputs:  []InputConfig{inputConfig},
 		}
-		runner, err := NewRunnerWithONNXBytes(onnxData, conf)
+		runner, err := NewRunnerWithModelData(modelData, conf)
 		if err != nil {
 			t.Errorf("runner should be created without error, %v", err)
 		}
@@ -123,7 +127,6 @@ func TestNewRunnerFail(t *testing.T) {
 	type testConfig struct {
 		name     string
 		config   Config
-		data     []byte
 		expected string
 	}
 	testSet := []testConfig{
@@ -136,18 +139,6 @@ func TestNewRunnerFail(t *testing.T) {
 			name:     "load invalid ONNX file name",
 			config:   Config{ONNXModelPath: ""},
 			expected: "invalid filename",
-		},
-		{
-			name:     "load empty bytes",
-			config:   Config{},
-			data:     []byte{},
-			expected: "data is empty",
-		},
-		{
-			name:     "load invalid bytes",
-			config:   Config{},
-			data:     []byte("dummy_data"),
-			expected: "parse error",
 		},
 		{
 			name:     "attach no input profile",
@@ -195,13 +186,7 @@ func TestNewRunnerFail(t *testing.T) {
 	for _, ts := range testSet {
 		name, config, expected := ts.name, ts.config, ts.expected
 		t.Run(name, func(t *testing.T) {
-			var runner *Runner
-			var err error
-			if ts.data != nil {
-				runner, err = NewRunnerWithONNXBytes(ts.data, config)
-			} else {
-				runner, err = NewRunner(config)
-			}
+			runner, err := NewRunner(config)
 			if err != nil {
 				if !strings.Contains(fmt.Sprintf("%v", err), expected) {
 					t.Errorf(`error message should contain expected phrase

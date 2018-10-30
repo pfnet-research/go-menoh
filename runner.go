@@ -43,18 +43,11 @@ func NewRunner(conf Config) (*Runner, error) {
 	return buildRunner(modelData, conf)
 }
 
-// NewRunnerWithONNXBytes returns Runner using configuration and ONNX model.
+// NewRunnerWithModelData returns Runner using configuration and ONNX model.
 // The ONNX model is passed on memory, not use conf.ONNXModelPath.
 // Spec of a returned runner is same as NewRunner, see docs of the function.
-func NewRunnerWithONNXBytes(onnx []byte, conf Config) (*Runner, error) {
-	if len(onnx) == 0 {
-		return nil, fmt.Errorf("ONNX file data is empty")
-	}
-	modelData, err := external.MakeModelDataFromONNXBytes(onnx)
-	if err != nil {
-		return nil, err
-	}
-	return buildRunner(modelData, conf)
+func NewRunnerWithModelData(modelData *ModelData, conf Config) (*Runner, error) {
+	return buildRunner(&modelData.ModelData, conf)
 }
 
 func buildRunner(modelData *external.ModelData, conf Config) (runner *Runner, err error) {
