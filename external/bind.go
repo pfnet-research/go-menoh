@@ -354,58 +354,37 @@ const (
 )
 
 func (e typeMenohError) String() string {
-	switch e {
-	case typeSuccess:
-		return "success"
-	case typeSTDError:
-		return "std error"
-	case typeUnknownError:
-		return "unknown error"
-	case typeInvalidFilename:
-		return "invalid filename"
-	case typeUnsupportedONNXOpsetVersion:
-		return "unsupported ONNX opset version"
-	case typeONNXParseError:
-		return "ONNX parse error"
-	case typeInvalidDtype:
-		return "invalid dtype"
-	case typeInvalidAttributeType:
-		return "invalid attribute type"
-	case typeUnsupportedOperatorAttribute:
-		return "unsupported operator attribute"
-	case typeDimensionMismatch:
-		return "dimension mismatch"
-	case typeVariableNotFound:
-		return "variable not found"
-	case typeIndexOutOfRange:
-		return "index out of range"
-	case typeJSONParseError:
-		return "JSON parse error"
-	case typeInvalidBackendName:
-		return "invalid backend name"
-	case typeUnsupportedOperator:
-		return "unsupported operator"
-	case typeFailedToConfigureOperator:
-		return "failed to configure operator"
-	case typeBackendError:
-		return "backend error"
-	case typeSameNamedVariableAlreadyExist:
-		return "same named variable already exist"
-	case typeUnsupportedInputDims:
-		return "unsupported input dims"
-	case typeSameNamedParameterAlreadyExist:
-		return "same named parameter already exist"
-	case typeSameNamedAttributeAlreadyExist:
-		return "same named attribute already exist"
-	case typeInvalidBackendConfigError:
-		return "invalid backend config"
-	case typeInputNotFoundError:
-		return "input not found"
-	case typeOutputNotFoundError:
-		return "output not found"
-	default:
+	messages := []string{
+		"success",
+		"std error",
+		"unknown error",
+		"invalid filename",
+		"unsupported ONNX opset version",
+		"ONNX parse error",
+		"invalid dtype",
+		"invalid attribute type",
+		"unsupported operator attribute",
+		"dimension mismatch",
+		"variable not found",
+		"index out of range",
+		"JSON parse error",
+		"invalid backend name",
+		"unsupported operator",
+		"failed to configure operator",
+		"backend error",
+		"same named variable already exist",
+		"unsupported input dims",
+		"same named parameter already exist",
+		"same named attribute already exist",
+		"invalid backend config",
+		"input not found",
+		"output not found",
+	}
+
+	if e < typeSuccess || e > typeOutputNotFoundError {
 		return "unknown type error"
 	}
+	return messages[e]
 }
 
 func checkError(errCode C.int) error {
