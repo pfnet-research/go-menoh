@@ -112,6 +112,7 @@ func TestAddTensorParameter(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer md.Delete()
 	param := &FloatTensor{
 		Dims:  []int32{3},
 		Array: []float32{0., 0.},
