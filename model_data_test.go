@@ -106,3 +106,55 @@ func TestNewModelDataFromBytes(t *testing.T) {
 		})
 	}
 }
+
+func TestAddTensorParameter(t *testing.T) {
+	md, err := NewRawModelData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	param := &FloatTensor{
+		Dims:  []int32{3},
+		Array: []float32{0., 0.},
+	}
+	if err := md.AddTensorParameter("param", param); err != nil {
+		t.Errorf("parameter should be added, %v", err)
+	}
+}
+
+func TestAddNodeAndSetup(t *testing.T) {
+	md, err := NewRawModelData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer md.Delete()
+	// Gemm
+	if err := md.AddNewNode("Gemm"); err != nil {
+		t.Fatalf("new Gemm node should be added, %v", err)
+	}
+	if err := md.AddInputNameToCurrentNode("A"); err != nil {
+		t.Fatalf("input name should be added, %v", err)
+	}
+	if err := md.AddOutputNameToCurrentNode("Y"); err != nil {
+		t.Fatalf("output name should be added, %v", err)
+	}
+	if err := md.AddAttributeIntToCurrentNode("transA", 1); err != nil {
+		t.Fatalf("int attribute should be added, %v", err)
+	}
+	if err := md.AddAttributeFloatToCurrentNode("alpha", 1.0); err != nil {
+		t.Fatalf("float attribute should be added, %v", err)
+	}
+	// Pad
+	if err := md.AddNewNode("Pad"); err != nil {
+		t.Fatalf("new Pad node should be added, %v", err)
+	}
+	if err := md.AddAttributeIntsToCurrentNode("pads", []int{5, 5}); err != nil {
+		t.Fatalf("int array attribute should be added, %v", err)
+	}
+	// GRU
+	if err := md.AddNewNode("GRU"); err != nil {
+		t.Fatalf("new GRU node should be added, %v", err)
+	}
+	if err := md.AddAttributeFloatsToCurrentNode("activation_alpha", []float32{0.1, 0.1}); err != nil {
+		t.Fatalf("floats attribute should be added, %v", err)
+	}
+}

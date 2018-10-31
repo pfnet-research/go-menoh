@@ -41,8 +41,8 @@ func NewModelDataFromBytes(data []byte) (*ModelData, error) {
 	return &ModelData{*m}, nil
 }
 
-// AddTensorAsParameter adds tensor to named parameter.
-func (m *ModelData) AddTensorAsParameter(name string, param Tensor) error {
+// AddTensorParameter adds tensor to named parameter.
+func (m *ModelData) AddTensorParameter(name string, param Tensor) error {
 	menohDtype, err := toMenohDtype(param.dtype())
 	if err != nil {
 		return err
