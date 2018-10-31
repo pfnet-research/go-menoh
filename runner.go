@@ -117,7 +117,7 @@ func (r *Runner) makeModelBuilder() error {
 	return nil
 }
 
-func (r *Runner) makeModel() error {
+func (r *Runner) buildModel() error {
 	model, err := r.modelBuilder.BuildModel(
 		*r.modelData, r.conf.Backend.String(), r.conf.BackendConfig)
 	if err != nil {
@@ -162,7 +162,7 @@ func buildRunner(modelData *external.ModelData, conf Config) (runner *Runner, er
 	if err = runner.makeModelBuilder(); err != nil {
 		return
 	}
-	if err = runner.makeModel(); err != nil {
+	if err = runner.buildModel(); err != nil {
 		return
 	}
 
