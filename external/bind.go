@@ -42,7 +42,7 @@ func MakeModelDataFromONNX(path string) (*ModelData, error) {
 func MakeModelDataFromONNXBytes(data []byte) (*ModelData, error) {
 	var h C.menoh_model_data_handle
 	if err := checkError(C.menoh_make_model_data_from_onnx_data_on_memory(
-			(*C.uchar)(unsafe.Pointer(&data[0])), C.int(len(data)), &h)); err != nil {
+		(*C.uchar)(unsafe.Pointer(&data[0])), C.int(len(data)), &h)); err != nil {
 		return nil, err
 	}
 	return &ModelData{h: h}, nil

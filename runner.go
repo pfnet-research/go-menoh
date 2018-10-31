@@ -50,6 +50,95 @@ func NewRunnerWithModelData(modelData *ModelData, conf Config) (*Runner, error) 
 	return buildRunner(&modelData.ModelData, conf)
 }
 
+func (r *Runner) makeVariableProfileTableBuilder() error {
+	vptBuilder, err := external.MakeVariableProfileTableBuilder()
+	if err != nil {
+		return err
+	}
+	r.vptBuilder = vptBuilder
+	for _, c := range r.conf.Inputs {
+		menohDtype, _ := toMenohDtype(c.Dtype)
+		if err = vptBuilder.AddInputProfile(c.Name, menohDtype, c.Dims...); err != nil {
+			return err
+		}
+	}
+	for _, c := range r.conf.Outputs {
+		menohDtype, _ := toMenohDtype(c.Dtype)
+		if err = vptBuilder.AddOutputProfile(c.Name, menohDtype); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Runner) buildVariableProfileTable() error {
+	vpt, err := r.vptBuilder.BuildVariableProfileTable(*r.modelData)
+	if err != nil {
+		return err
+	}
+	r.vpTable = vpt
+	for _, c := range r.conf.Outputs {
+		if !c.FromInternal {
+			continue
+		}
+		vp, err := vpt.GetVariableProfile(c.Name)
+		if err != nil {
+			return err
+		}
+		dtype, _ := toDtype(vp.Dtype)
+		tensor := newTensorHandle(dtype, vp.Dims...)
+		r.outputs[c.Name] = tensor
+	}
+	return nil
+}
+
+func (r *Runner) makeModelBuilder() error {
+	modelBuilder, err := external.MakeModelBuilder(*r.vpTable)
+	if err != nil {
+		return err
+	}
+	r.modelBuilder = modelBuilder
+	for _, c := range r.conf.Inputs {
+		tensor := newTensorHandle(c.Dtype, c.Dims...)
+		if err := modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
+			return err
+		}
+		r.inputs[c.Name] = tensor
+	}
+	for _, c := range r.conf.Outputs {
+		if !c.FromInternal {
+			continue
+		}
+		tensor := r.outputs[c.Name]
+		if err := modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Runner) buildModel() error {
+	model, err := r.modelBuilder.BuildModel(
+		*r.modelData, r.conf.Backend.String(), r.conf.BackendConfig)
+	if err != nil {
+		return err
+	}
+	r.model = model
+	for _, c := range r.conf.Outputs {
+		if c.FromInternal {
+			continue
+		}
+		out, err := model.GetVariable(c.Name)
+		if err != nil {
+			return err
+		}
+		dtype, _ := toDtype(out.Dtype)
+		tensor := newTensorHandleByPtr(dtype, out.BufferHandle, out.Dims...)
+		r.outputs[c.Name] = tensor
+	}
+	return nil
+}
+
 func buildRunner(modelData *external.ModelData, conf Config) (runner *Runner, err error) {
 	runner = &Runner{
 		modelData: modelData,
@@ -64,82 +153,17 @@ func buildRunner(modelData *external.ModelData, conf Config) (runner *Runner, er
 		}
 	}()
 
-	vptBuilder, err := external.MakeVariableProfileTableBuilder()
-	if err != nil {
+	if err = runner.makeVariableProfileTableBuilder(); err != nil {
 		return
 	}
-	runner.vptBuilder = vptBuilder
-	for _, c := range conf.Inputs {
-		menohDtype, _ := toMenohDtype(c.Dtype)
-		if err = vptBuilder.AddInputProfile(c.Name, menohDtype, c.Dims...); err != nil {
-			return
-		}
-	}
-	for _, c := range conf.Outputs {
-		menohDtype, _ := toMenohDtype(c.Dtype)
-		if err = vptBuilder.AddOutputProfile(c.Name, menohDtype); err != nil {
-			return
-		}
-	}
-
-	vpt, err := vptBuilder.BuildVariableProfileTable(*modelData)
-	if err != nil {
+	if err = runner.buildVariableProfileTable(); err != nil {
 		return
 	}
-	runner.vpTable = vpt
-	for _, c := range conf.Outputs {
-		if !c.FromInternal {
-			continue
-		}
-		vp, lerr := vpt.GetVariableProfile(c.Name)
-		if lerr != nil {
-			err = lerr
-			return
-		}
-		dtype, _ := toDtype(vp.Dtype)
-		tensor := newTensorHandle(dtype, vp.Dims...)
-		runner.outputs[c.Name] = tensor
-	}
-
-	modelBuilder, err := external.MakeModelBuilder(*vpt)
-	if err != nil {
+	if err = runner.makeModelBuilder(); err != nil {
 		return
 	}
-	runner.modelBuilder = modelBuilder
-	for _, c := range conf.Inputs {
-		tensor := newTensorHandle(c.Dtype, c.Dims...)
-		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
-			return
-		}
-		runner.inputs[c.Name] = tensor
-	}
-	for _, c := range conf.Outputs {
-		if !c.FromInternal {
-			continue
-		}
-		tensor := runner.outputs[c.Name]
-		if err = modelBuilder.AttachExternalBuffer(c.Name, tensor.ptr()); err != nil {
-			return
-		}
-	}
-
-	model, err := modelBuilder.BuildModel(*modelData, conf.Backend.String(), conf.BackendConfig)
-	if err != nil {
+	if err = runner.buildModel(); err != nil {
 		return
-	}
-	runner.model = model
-	for _, c := range conf.Outputs {
-		if c.FromInternal {
-			continue
-		}
-		out, lerr := model.GetVariable(c.Name)
-		if lerr != nil {
-			err = lerr
-			return
-		}
-		dtype, _ := toDtype(out.Dtype)
-		tensor := newTensorHandleByPtr(dtype, out.BufferHandle, out.Dims...)
-		runner.outputs[c.Name] = tensor
 	}
 
 	return
