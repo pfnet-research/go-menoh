@@ -42,10 +42,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	resizedImg := cropAndResize(img, width, height)
+	resizedImg := resize(img, width, height)
+	bgrMean := []float32{103.939, 116.779, 123.68}
 	resizedImgTensor := &menoh.FloatTensor{
 		Dims:  []int32{batch, channel, height, width},
-		Array: toOneHotFloats(resizedImg, channel),
+		Array: toOneHotFloats(resizedImg, channel, bgrMean),
 	}
 
 	// build model runner
@@ -109,20 +110,20 @@ func main() {
 	}
 }
 
-func cropAndResize(img image.Image, width, height int) image.Image {
-	return imaging.Fill(img, width, height, imaging.Center, imaging.Linear)
+func resize(img image.Image, width, height int) image.Image {
+	return imaging.Resize(img, width, height, imaging.Linear)
 }
 
-func toOneHotFloats(img image.Image, channel int) []float32 {
+func toOneHotFloats(img image.Image, channel int, bgrMean []float32) []float32 {
 	bounds := img.Bounds()
 	w, h := bounds.Dx(), bounds.Dy()
 	floats := make([]float32, channel*h*w)
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			floats[0*(w*h)+y*w+x] = float32(b / 257)
-			floats[1*(w*h)+y*w+x] = float32(g / 257)
-			floats[2*(w*h)+y*w+x] = float32(r / 257)
+			floats[0*(w*h)+y*w+x] = float32(b/257) - bgrMean[0]
+			floats[1*(w*h)+y*w+x] = float32(g/257) - bgrMean[1]
+			floats[2*(w*h)+y*w+x] = float32(r/257) - bgrMean[2]
 		}
 	}
 	return floats
