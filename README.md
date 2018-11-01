@@ -11,7 +11,7 @@ Golang binding for [Menoh](https://github.com/pfnet-research/menoh)
 ## Requirements
 
 - Go 1.10+
-- [Menoh](https://github.com/pfnet-research/menoh) 1.0.3+
+- [Menoh](https://github.com/pfnet-research/menoh) 1.1.1+
 
 ## Install
 
