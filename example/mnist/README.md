@@ -18,17 +18,20 @@ $ tar xfz data/mnist.tar.gz -C data
 ```
 
 ```
-examples/
-  |- mnist
-      |- main.go
-      |- README.md (this file)
-      |- data/
-          |- mnist
-              |- test_data_set_0/
-              |- test_data_set_1/
-              |- test_data_set_2/
-              |- model.onnx
-              |- ...
+example/mnist/
+├── README.md (this file)
+├── data
+│   ├── mnist
+│   │   ├── mnist.onnx
+│   │   ├── test_data_set_0
+│   │   │   ├── input_0.pb
+│   │   │   └── output_0.pb
+│   │   ├── test_data_set_1
+│   │   │   ├── ...
+│   │   └── test_data_set_2
+│   │       ├── ...
+│   └── mnist.tar.gz
+└── main.go
 ```
 
 ### Replace model

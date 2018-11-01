@@ -20,13 +20,13 @@ func main() {
 		width   = 224
 		height  = 224
 
-		conv1_1InName  = "140326425860192"
-		fc6OutName     = "140326200777584"
-		softmaxOutName = "140326200803680"
+		conv1_1InName  = "Input_0"
+		fc6OutName     = "Gemm_0"
+		softmaxOutName = "Softmax_0"
 	)
 	var (
 		inputImagePath  = flag.String("input-image", "data/Light_sussex_hen.jpg", "input image path")
-		onnxModelPath   = flag.String("model", "data/VGG16.onnx", "ONNX model path")
+		onnxModelPath   = flag.String("model", "data/vgg16.onnx", "ONNX model path")
 		synsetWordsPath = flag.String("synset-words", "data/synset_words.txt", "synset words file path")
 	)
 	flag.Parse()
@@ -105,6 +105,7 @@ func main() {
 		panic(err)
 	}
 	topKIndices := extractTopKIndexList(softmaxOutData, 5)
+	fmt.Println("top 5 categories are")
 	for _, idx := range topKIndices {
 		fmt.Printf("%d %.5f %s\n", idx, softmaxOutData[idx], categories[idx])
 	}
@@ -121,9 +122,9 @@ func toOneHotFloats(img image.Image, channel int, bgrMean []float32) []float32 {
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			floats[0*(w*h)+y*w+x] = float32(b/257) - bgrMean[0]
+			floats[0*(w*h)+y*w+x] = float32(r/257) - bgrMean[2]
 			floats[1*(w*h)+y*w+x] = float32(g/257) - bgrMean[1]
-			floats[2*(w*h)+y*w+x] = float32(r/257) - bgrMean[2]
+			floats[2*(w*h)+y*w+x] = float32(b/257) - bgrMean[0]
 		}
 	}
 	return floats
